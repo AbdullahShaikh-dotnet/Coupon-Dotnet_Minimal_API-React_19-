@@ -1,3 +1,6 @@
+using Coupon_API.Data;
+using Coupon_API.Models;
+using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,48 +23,43 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+
+
+app.MapGet("/api/coupon", () =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    return Results.Ok(CouponStore.couponList);
+}).WithName("GetCoupons");
 
-app.MapGet("/weatherforecast", () =>
+
+app.MapGet("/api/coupon/{id:int}", (int id) =>
 {
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    return Results.Ok(CouponStore.couponList.FirstOrDefault(coupon => coupon.Id == id));
+}).WithName("GetCoupon");
 
 
-
-app.MapGet("/hello", () =>
+app.MapPost("/api/coupon", ([FromBody] Coupon coupon) =>
 {
-    return Results.Ok("Test Working");
-});
+    if(coupon.Id != 0 || string.IsNullOrEmpty(coupon.Name))
+    {
+        return Results.BadRequest("Invalid Coupon Id or Name");
+    }
 
+    if(CouponStore.couponList.Exists(c => c.Name == coupon.Name))
+    {
+        return Results.BadRequest("Coupon Name already Exists");
+    }
 
-app.MapGet("/TestInteger/{id:int}", (int id) =>
-{
-    return Results.Ok($"Ye Teri ID hai => {id}");
-});
+    coupon.Id = CouponStore.couponList.OrderByDescending(c => c.Id).FirstOrDefault().Id + 1;
 
+    CouponStore.couponList.Add(coupon);
 
-app.MapGet("/error", () =>
-{
-    return Results.BadRequest("error");
-});
+    //return Results.Ok("Coupon Created Successfully");
+
+    //return Results.Created($"api/coupon/{coupon.Id}", coupon);
+
+    return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id } , coupon);
+
+}).WithName("CreateCoupons");
 
 
 app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
