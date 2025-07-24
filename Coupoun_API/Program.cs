@@ -28,23 +28,23 @@ app.UseHttpsRedirection();
 app.MapGet("/api/coupon", () =>
 {
     return Results.Ok(CouponStore.couponList);
-}).WithName("GetCoupons");
+}).WithName("GetCoupons").Produces<IEnumerable<Coupon>>(200);
 
 
 app.MapGet("/api/coupon/{id:int}", (int id) =>
 {
     return Results.Ok(CouponStore.couponList.FirstOrDefault(coupon => coupon.Id == id));
-}).WithName("GetCoupon");
+}).WithName("GetCoupon").Produces<Coupon>(200);
 
 
 app.MapPost("/api/coupon", ([FromBody] Coupon coupon) =>
 {
-    if(coupon.Id != 0 || string.IsNullOrEmpty(coupon.Name))
+    if (coupon.Id != 0 || string.IsNullOrEmpty(coupon.Name))
     {
         return Results.BadRequest("Invalid Coupon Id or Name");
     }
 
-    if(CouponStore.couponList.Exists(c => c.Name == coupon.Name))
+    if (CouponStore.couponList.Exists(c => c.Name == coupon.Name))
     {
         return Results.BadRequest("Coupon Name already Exists");
     }
@@ -57,9 +57,9 @@ app.MapPost("/api/coupon", ([FromBody] Coupon coupon) =>
 
     //return Results.Created($"api/coupon/{coupon.Id}", coupon);
 
-    return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id } , coupon);
+    return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id }, coupon);
 
-}).WithName("CreateCoupons");
+}).WithName("CreateCoupons").Produces<Coupon>(201).Produces(400).Accepts<Coupon>("application/json");
 
 
 app.Run();
