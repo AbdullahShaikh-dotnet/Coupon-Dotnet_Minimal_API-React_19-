@@ -25,14 +25,16 @@ app.UseHttpsRedirection();
 
 
 
-app.MapGet("/api/coupon", () =>
+app.MapGet("/api/coupon", (ILogger<Program> _logger) =>
 {
+    _logger.LogInformation("Getting Coupons");
     return Results.Ok(CouponStore.couponList);
 }).WithName("GetCoupons").Produces<IEnumerable<Coupon>>(200);
 
 
-app.MapGet("/api/coupon/{id:int}", (int id) =>
+app.MapGet("/api/coupon/{id:int}", (ILogger<Program> _logger, int id) =>
 {
+    _logger.Log(LogLevel.Warning, "Just for Fun");
     return Results.Ok(CouponStore.couponList.FirstOrDefault(coupon => coupon.Id == id));
 }).WithName("GetCoupon").Produces<Coupon>(200);
 
