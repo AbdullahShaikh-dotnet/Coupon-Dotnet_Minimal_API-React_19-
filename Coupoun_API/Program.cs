@@ -1,8 +1,10 @@
+using AutoMapper;
+using Coupon_API;
 using Coupon_API.Data;
 using Coupon_API.Models;
 using Coupon_API.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Register the in-memory data store
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<MappingConfig>();
+});
+
 
 var app = builder.Build();
 
@@ -40,7 +49,7 @@ app.MapGet("/api/coupon/{id:int}", (ILogger<Program> _logger, int id) =>
 }).WithName("GetCoupon").Produces<Coupon>(200);
 
 
-app.MapPost("/api/coupon", ([FromBody] CouponCreateDTO _CouponCreateDTO) =>
+app.MapPost("/api/coupon", (IMapper _mapper, [FromBody] CouponCreateDTO _CouponCreateDTO) =>
 {
     if (string.IsNullOrEmpty(_CouponCreateDTO.Name))
     {
@@ -52,34 +61,18 @@ app.MapPost("/api/coupon", ([FromBody] CouponCreateDTO _CouponCreateDTO) =>
         return Results.BadRequest("Coupon Name already Exists");
     }
 
-
-    Coupon coupon = new()
-    {
-        CouponCode = _CouponCreateDTO.CouponCode,
-        Id = CouponStore.couponList.OrderByDescending(c => c.Id).FirstOrDefault().Id + 1,
-        Name = _CouponCreateDTO.Name,
-        Percentage = _CouponCreateDTO.Percentage,
-        ExpireDate = _CouponCreateDTO.ExpireDate,
-    };
+    Coupon coupon = _mapper.Map<Coupon>(_CouponCreateDTO);
 
     CouponStore.couponList.Add(coupon);
 
-    CouponDTO couponDTO = new()
-    {
-        Id = coupon.Id,
-        Name = coupon.Name,
-        CouponCode = coupon.CouponCode,
-        Percentage = coupon.Percentage,
-        ExpireDate = coupon.ExpireDate,
-        CreateDate = coupon.CreateDate,
-        IsActive = coupon.IsActive
-    };
-
-
+    CouponDTO couponDTO = _mapper.Map<CouponDTO>(coupon);
 
     return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id }, couponDTO);
 
-}).WithName("CreateCoupons").Produces<CouponDTO>(201).Produces(400).Accepts<CouponCreateDTO>("application/json");
+}).WithName("CreateCoupons")
+.Produces<CouponDTO>(201)
+.Produces(400)
+.Accepts<CouponCreateDTO>("application/json");
 
 
 app.Run();
