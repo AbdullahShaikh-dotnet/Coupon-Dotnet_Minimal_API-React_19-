@@ -44,11 +44,16 @@ app.UseHttpsRedirection();
 
 
 // Get All Coupon
-app.MapGet("/api/coupon", (ILogger<Program> _logger) =>
+app.MapGet("/api/coupon", (IMapper mapper, ILogger<Program> _logger) =>
 {
+    var coupons = mapper.Map<IEnumerable<CouponDTO>>(
+        CouponStore.couponList
+        .Where(coupon => coupon.DeleteId == 0)
+        );
+
     APIResponse response = new APIResponse
     {
-        Result = CouponStore.couponList,
+        Result = coupons,
         IsSuccess = true,
         StatusCode = HttpStatusCode.OK
     };
@@ -62,11 +67,16 @@ app.MapGet("/api/coupon", (ILogger<Program> _logger) =>
 
 
 // Get Coupon By ID
-app.MapGet("/api/coupon/{id:int}", (ILogger<Program> _logger, int id) =>
+app.MapGet("/api/coupon/{id:int}", (IMapper mapper, ILogger<Program> _logger, int id) =>
 {
+    var coupon = mapper.Map<IEnumerable<CouponDTO>>(
+        CouponStore.couponList
+        .FirstOrDefault(coupon => coupon.Id == id && coupon.DeleteId == 0)
+        );
+
     APIResponse response = new APIResponse
     {
-        Result = CouponStore.couponList.FirstOrDefault(coupon => coupon.Id == id),
+        Result = coupon,
         IsSuccess = true,
         StatusCode = HttpStatusCode.OK
     };
