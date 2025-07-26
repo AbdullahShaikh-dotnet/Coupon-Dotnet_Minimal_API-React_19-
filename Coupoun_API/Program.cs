@@ -6,6 +6,7 @@ using Coupon_API.Models.DTO;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -67,19 +68,25 @@ app.MapGet("/api/coupon", (IMapper mapper, ILogger<Program> _logger) =>
 
 
 // Get Coupon By ID
-app.MapGet("/api/coupon/{id:int}", (IMapper mapper, ILogger<Program> _logger, int id) =>
+app.MapGet("/api/coupon/{id:int}", async (IValidator<int> validator, IMapper mapper, ILogger<Program> _logger, int id) =>
 {
+    APIResponse response = new APIResponse();
+    var validationResult = await validator.ValidateAsync(id);
+
+    if (!validationResult.IsValid)
+    {
+        response.ErrorMessages = validationResult.Errors.Select(error => error.ErrorMessage).ToList();
+        return Results.BadRequest(response);
+    }
+
     var coupon = mapper.Map<IEnumerable<CouponDTO>>(
         CouponStore.couponList
         .FirstOrDefault(coupon => coupon.Id == id && coupon.DeleteId == 0)
-        );
+    );
 
-    APIResponse response = new APIResponse
-    {
-        Result = coupon,
-        IsSuccess = true,
-        StatusCode = HttpStatusCode.OK
-    };
+    response.Result = coupon;
+    response.IsSuccess = true;
+    response.StatusCode = HttpStatusCode.OK;
 
     _logger.Log(LogLevel.Warning, "Just for Fun");
     return Results.Ok(response);
@@ -167,7 +174,7 @@ app.MapPut("/api/coupon", async (IMapper mapper, IValidator<CouponUpdateDTO> _va
 
     response.Result = resultCoupon;
 
-    return Results.CreatedAtRoute("GetCoupon",  new { id = coupon.Id }, response);
+    return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id }, response);
 }).Produces<APIResponse>(200)
 .Produces(400)
 .Accepts<CouponUpdateDTO>(contentType: "application/json")
@@ -176,8 +183,18 @@ app.MapPut("/api/coupon", async (IMapper mapper, IValidator<CouponUpdateDTO> _va
 
 
 // Delete Coupon
-app.MapDelete("/api/coupon{id:int}", (IMapper mapper, int id) =>
+app.MapDelete("/api/coupon{id:int}", async (IMapper mapper, IValidator<int> validator, int id) =>
 {
+    APIResponse response = new APIResponse();
+
+    var validationResult = await validator.ValidateAsync(id);
+
+    if (!validationResult.IsValid)
+    {
+        response.ErrorMessages = validationResult.Errors.Select(error => error.ErrorMessage).ToList();
+        return Results.BadRequest(response);
+    }
+
 
     var coupon = CouponStore.couponList.FirstOrDefault(prop => prop.Id == id);
     coupon.DeleteId = 1;
@@ -185,7 +202,6 @@ app.MapDelete("/api/coupon{id:int}", (IMapper mapper, int id) =>
 
     var coupons = CouponStore.couponList.Where(prop => prop.DeleteId == 0);
 
-    APIResponse response = new APIResponse();
     response.Result = mapper.Map<IEnumerable<CouponDTO>>(coupons);
     response.IsSuccess = true;
     response.StatusCode = HttpStatusCode.OK;
@@ -194,8 +210,7 @@ app.MapDelete("/api/coupon{id:int}", (IMapper mapper, int id) =>
 
 }).WithName("DeleteCoupon")
 .Produces<APIResponse>(200)
-.Produces(400)
-.Accepts<int>(contentType: "application/json");
+.Produces(400);
 
 
 app.Run();
