@@ -164,4 +164,28 @@ app.MapPut("/api/coupon", async (IMapper mapper, IValidator<CouponUpdateDTO> _va
 .WithName("UpdateCoupons");
 
 
+
+// Delete Coupon
+app.MapDelete("/api/coupon{id:int}", (IMapper mapper, int id) =>
+{
+
+    var coupon = CouponStore.couponList.FirstOrDefault(prop => prop.Id == id);
+    coupon.DeleteId = 1;
+    coupon.DeleteDate = DateTime.Now;
+
+    var coupons = CouponStore.couponList.Where(prop => prop.DeleteId == 0);
+
+    APIResponse response = new APIResponse();
+    response.Result = mapper.Map<IEnumerable<CouponDTO>>(coupons);
+    response.IsSuccess = true;
+    response.StatusCode = HttpStatusCode.OK;
+
+    return Results.CreatedAtRoute("GetCoupon", new { id }, response);
+
+}).WithName("DeleteCoupon")
+.Produces<APIResponse>(200)
+.Produces(400)
+.Accepts<int>(contentType: "application/json");
+
+
 app.Run();
