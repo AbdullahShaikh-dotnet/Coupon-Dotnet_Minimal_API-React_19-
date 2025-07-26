@@ -12,7 +12,6 @@ namespace Coupon_API.Data
                 Name = "10% Off",
                 Percentage = 10,
                 ExpireDate = DateTime.Now.AddDays(30),
-                CouponCode = "10OFF",
                 IsActive = true,
                 CreateId = 1,
                 CreateDate = DateTime.Now
@@ -23,7 +22,6 @@ namespace Coupon_API.Data
                 Name = "20% Off",
                 Percentage = 20,
                 ExpireDate = DateTime.Now.AddDays(60),
-                CouponCode = "20OFF",
                 IsActive = true,
                 CreateId = 1,
                 CreateDate = DateTime.Now

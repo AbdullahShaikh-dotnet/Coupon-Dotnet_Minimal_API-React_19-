@@ -1,14 +1,11 @@
-﻿using Coupon_API.Data;
-
-namespace Coupon_API.Models.DTO
+﻿namespace Coupon_API.Models.DTO
 {
-    public class CouponCreateDTO
+    public class CouponUpdateDTO
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public int Percentage { get; set; }
-
         public DateTime ExpireDate { get; set; }
-
         public bool IsActive { get; set; } = true;
     }
 }

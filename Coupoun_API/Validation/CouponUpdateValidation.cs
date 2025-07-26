@@ -5,9 +5,9 @@ using FluentValidation;
 
 namespace Coupon_API.Validation
 {
-    public class CouponCreateValidation : AbstractValidator<CouponCreateDTO>
+    public class CouponUpdateValidation : AbstractValidator<CouponUpdateDTO>
     {
-        public CouponCreateValidation()
+        public CouponUpdateValidation()
         {
             RuleFor(model => model.Name)
                 .NotEmpty().WithMessage("Coupon Name is required.")
@@ -19,6 +19,8 @@ namespace Coupon_API.Validation
             RuleFor(model => model.ExpireDate)
                 .Must(date => date.Date >= DateTime.Now.Date)
                 .WithMessage("Expire date must be today or in the future.");
+
+            RuleFor(model => model.Id).GreaterThan(0).WithMessage("Id must be grater than zero"); ;
         }
     }
 }

@@ -6,6 +6,7 @@ using Coupon_API.Models.DTO;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,46 +41,127 @@ app.UseHttpsRedirection();
 
 
 
+
+
+// Get All Coupon
 app.MapGet("/api/coupon", (ILogger<Program> _logger) =>
 {
+    APIResponse response = new APIResponse
+    {
+        Result = CouponStore.couponList,
+        IsSuccess = true,
+        StatusCode = HttpStatusCode.OK
+    };
+
     _logger.LogInformation("Getting Coupons");
-    return Results.Ok(CouponStore.couponList);
-}).WithName("GetCoupons").Produces<IEnumerable<Coupon>>(200);
+    return Results.Ok(response);
+}).WithName("GetCoupons").Produces<APIResponse>(200);
 
 
+
+
+
+// Get Coupon By ID
 app.MapGet("/api/coupon/{id:int}", (ILogger<Program> _logger, int id) =>
 {
+    APIResponse response = new APIResponse
+    {
+        Result = CouponStore.couponList.FirstOrDefault(coupon => coupon.Id == id),
+        IsSuccess = true,
+        StatusCode = HttpStatusCode.OK
+    };
+
     _logger.Log(LogLevel.Warning, "Just for Fun");
-    return Results.Ok(CouponStore.couponList.FirstOrDefault(coupon => coupon.Id == id));
-}).WithName("GetCoupon").Produces<Coupon>(200);
+    return Results.Ok(response);
+}).WithName("GetCoupon").Produces<APIResponse>(200);
 
 
+
+
+
+
+// Add Coupon
 app.MapPost("/api/coupon", async (IMapper _mapper, IValidator<CouponCreateDTO> _validator, [FromBody] CouponCreateDTO _CouponCreateDTO) =>
 {
     var validationResult = await _validator.ValidateAsync(_CouponCreateDTO);
 
+    APIResponse response = new APIResponse();
+
     if (!validationResult.IsValid)
     {
-        return Results.BadRequest(validationResult.Errors.Select(error => error.ErrorMessage));
+        response.ErrorMessages = validationResult.Errors.Select(error => error.ErrorMessage).ToList();
+        return Results.BadRequest(response);
     }
 
     if (CouponStore.couponList.Exists(c => c.Name == _CouponCreateDTO.Name))
     {
-        return Results.BadRequest("Coupon Name already Exists");
+        response.ErrorMessages = new List<string>
+        {
+            "Coupon Name already Exists"
+        };
+        response.StatusCode = HttpStatusCode.Conflict;
+        return Results.BadRequest(response);
     }
 
     Coupon coupon = _mapper.Map<Coupon>(_CouponCreateDTO);
+    coupon.Id = CouponStore.couponList.OrderByDescending(prop => prop.Id).FirstOrDefault().Id + 1;
 
     CouponStore.couponList.Add(coupon);
 
-    CouponDTO couponDTO = _mapper.Map<CouponDTO>(coupon);
+    response.Result = _mapper.Map<CouponDTO>(coupon);
 
-    return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id }, couponDTO);
+    return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id }, response);
 
 }).WithName("CreateCoupons")
-.Produces<CouponDTO>(201)
+.Produces<APIResponse>(201)
 .Produces(400)
-.Accepts<CouponCreateDTO>("application/json");
+.Accepts<CouponCreateDTO>(contentType: "application/json");
+
+
+
+
+
+// Update Coupon
+app.MapPut("/api/coupon", async (IMapper mapper, IValidator<CouponUpdateDTO> _validator, [FromBody] CouponUpdateDTO couponUpdate) =>
+{
+    var validationResult = await _validator.ValidateAsync(couponUpdate);
+
+    APIResponse response = new APIResponse();
+
+    if (!validationResult.IsValid)
+    {
+        response.ErrorMessages = validationResult.Errors.Select(error => error.ErrorMessage).ToList();
+        return Results.BadRequest(response);
+    }
+
+
+    if (CouponStore.couponList.Exists(c => c.Name == couponUpdate.Name && c.Id != couponUpdate.Id))
+    {
+        response.ErrorMessages = new List<string>
+        {
+            "Coupon Name already Exists"
+        };
+        response.StatusCode = HttpStatusCode.Conflict;
+        return Results.BadRequest(response);
+    }
+
+    var coupon = CouponStore.couponList.FirstOrDefault(prop => prop.Id == couponUpdate.Id);
+    coupon.Name = couponUpdate.Name;
+    coupon.ExpireDate = couponUpdate.ExpireDate;
+    coupon.Percentage = couponUpdate.Percentage;
+    coupon.IsActive = couponUpdate.IsActive;
+    coupon.ModifyId = 1;
+    coupon.ModifyDate = DateTime.Now;
+
+    var resultCoupon = mapper.Map<CouponDTO>(coupon);
+
+    response.Result = resultCoupon;
+
+    return Results.CreatedAtRoute("GetCoupon",  new { id = coupon.Id }, response);
+}).Produces<APIResponse>(200)
+.Produces(400)
+.Accepts<CouponUpdateDTO>(contentType: "application/json")
+.WithName("UpdateCoupons");
 
 
 app.Run();
