@@ -35,12 +35,12 @@ namespace Coupon_API.Models
 
         public DateTime CreateDate { get; set; } = DateTime.Now;
 
-        public int ModifyId { get; set; }
+        public int? ModifyId { get; set; } = null;
 
-        public DateTime ModifyDate { get; set; }
+        public DateTime? ModifyDate { get; set; } = null;
 
-        public int DeleteId { get; set; }
+        public int? DeleteId { get; set; } = null;
 
-        public DateTime DeleteDate { get; set; }
+        public DateTime? DeleteDate { get; set; } = null;
     }
 }
