@@ -31,7 +31,10 @@ builder.Services.AddAutoMapper(cfg =>
 
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+   {
+       options.SerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+   });
 
 
 var app = builder.Build();
@@ -87,7 +90,7 @@ app.MapGet("/api/coupon/{id:int}", async (ApplicationDbContext _db, IValidator<i
 
     var coupon = mapper.Map<IEnumerable<CouponDTO>>(
         _db.Coupons
-        .FirstOrDefault(coupon => coupon.Id == id && coupon.DeleteId == null)
+        .FirstOrDefaultAsync(coupon => coupon.Id == id && coupon.DeleteId == null)
     );
 
     response.Result = coupon;
@@ -116,7 +119,7 @@ app.MapPost("/api/coupon", async (ApplicationDbContext _db, IMapper _mapper, IVa
         return Results.BadRequest(response);
     }
 
-    if (_db.Coupons.Any(c => c.Name == _CouponCreateDTO.Name))
+    if (await _db.Coupons.AnyAsync(c => c.Name == _CouponCreateDTO.Name))
     {
         response.ErrorMessages = new List<string>
         {
@@ -129,7 +132,7 @@ app.MapPost("/api/coupon", async (ApplicationDbContext _db, IMapper _mapper, IVa
     Coupon coupon = _mapper.Map<Coupon>(_CouponCreateDTO);
 
     _db.Coupons.Add(coupon);
-    _db.SaveChanges();
+    await _db.SaveChangesAsync();
 
     response.IsSuccess = true;
     response.Result = _mapper.Map<CouponDTO>(coupon);
@@ -169,7 +172,7 @@ app.MapPut("/api/coupon", async (ApplicationDbContext _db, IMapper mapper, IVali
         return Results.BadRequest(response);
     }
 
-    var coupon = _db.Coupons.FirstOrDefault(prop => prop.Id == couponUpdate.Id);
+    var coupon = await _db.Coupons.FirstOrDefaultAsync(prop => prop.Id == couponUpdate.Id);
     coupon.Name = couponUpdate.Name;
     coupon.ExpireDate = couponUpdate.ExpireDate;
     coupon.Percentage = couponUpdate.Percentage;
@@ -177,7 +180,7 @@ app.MapPut("/api/coupon", async (ApplicationDbContext _db, IMapper mapper, IVali
     coupon.ModifyId = 1;
     coupon.ModifyDate = DateTime.Now;
 
-    _db.SaveChanges();
+    await _db.SaveChangesAsync();
 
 
     var resultCoupon = mapper.Map<CouponDTO>(coupon);
@@ -206,11 +209,13 @@ app.MapDelete("/api/coupon{id:int}", async (ApplicationDbContext _db, IMapper ma
     }
 
 
-    var coupon = _db.Coupons.FirstOrDefault(prop => prop.Id == id);
+    var coupon = await _db.Coupons.FirstOrDefaultAsync(prop => prop.Id == id);
     coupon.DeleteId = 1;
     coupon.DeleteDate = DateTime.Now;
 
-    var coupons = _db.Coupons.Where(prop => prop.DeleteId == 0);
+    await _db.SaveChangesAsync();
+
+    var coupons = _db.Coupons.Where(prop => prop.DeleteId == null);
 
     response.Result = mapper.Map<IEnumerable<CouponDTO>>(coupons);
     response.IsSuccess = true;
