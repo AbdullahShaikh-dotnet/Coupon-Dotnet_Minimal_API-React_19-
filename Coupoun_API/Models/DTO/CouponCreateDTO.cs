@@ -7,7 +7,7 @@ namespace Coupon_API.Models.DTO
         public string Name { get; set; }
         public int Percentage { get; set; }
 
-        public DateTime ExpireDate { get; set; }
+        public DateOnly ExpireDate { get; set; }
 
         public bool IsActive { get; set; } = true;
     }

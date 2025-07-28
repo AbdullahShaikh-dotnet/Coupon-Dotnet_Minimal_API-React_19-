@@ -17,7 +17,7 @@ namespace Coupon_API.Validation
                 .InclusiveBetween(1, 100).WithMessage("Percentage must be between 1 to 100");
 
             RuleFor(model => model.ExpireDate)
-                .Must(date => date.Date >= DateTime.Now.Date)
+                .Must(date => date >= DateOnly.FromDateTime(DateTime.Now.Date))
                 .WithMessage("Expire date must be today or in the future.");
         }
     }

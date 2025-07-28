@@ -5,29 +5,20 @@ namespace Coupon_API.Models
     public class Coupon
     {
         public int Id { get; set; }
+
         public string Name { get; set; }
+
         public string CouponCode => Name.ToUpper().Trim() + Percentage.ToString();
 
         public int Percentage { get; set; }
-        public DateTime ExpireDate { get; set; }
 
-        public int ValidDays
-        {
-            get
-            {
-                return (ExpireDate - CreateDate).Days;
-            }
-        }
+        public DateOnly ExpireDate { get; set; }
 
         public bool IsSpecial { get; set; } = false;
 
-        public bool isValid
-        {
-            get
-            {
-                return ExpireDate > DateTime.Now && IsActive;
-            }
-        }
+        public int ValidDays => ExpireDate.DayNumber - DateOnly.FromDateTime(CreateDate).DayNumber;
+
+        public bool IsValid => ExpireDate > DateOnly.FromDateTime(DateTime.Now) && IsActive;
 
         public bool IsActive { get; set; }
 

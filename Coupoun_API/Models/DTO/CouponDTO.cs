@@ -6,26 +6,8 @@
         public string Name { get; set; }
         public string CouponCode { get; set; }
         public int Percentage { get; set; }
-        public DateTime ExpireDate { get; set; }
-
-        public int ValidDays
-        {
-            get
-            {
-                return (ExpireDate - CreateDate).Days;
-            }
-        }
-
-        public bool IsActive { get; set; } = true;
-
+        public DateOnly ExpireDate { get; set; }
         public DateTime CreateDate { get; set; }
-
-        public bool isValid
-        {
-            get
-            {
-                return ExpireDate > DateTime.Now && IsActive;
-            }
-        }
+        public bool IsActive { get; set; } = true;
     }
 }
