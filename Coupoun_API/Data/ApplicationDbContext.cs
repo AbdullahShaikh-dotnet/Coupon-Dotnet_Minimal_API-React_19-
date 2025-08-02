@@ -11,6 +11,7 @@ namespace Coupon_API.Data
         }
 
         public DbSet<Coupon> Coupons { get; set; }
+        public DbSet<User> Users { get; set; }
 
     }
 }
