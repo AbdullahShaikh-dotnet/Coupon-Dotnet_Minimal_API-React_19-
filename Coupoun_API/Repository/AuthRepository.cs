@@ -28,19 +28,19 @@ namespace Coupon_API.Repository
 
         public bool IsUniqueUser(string userName)
         {
-            var user = _db.Users.FirstOrDefault(u => string.Equals(u.UserName, userName, StringComparison.OrdinalIgnoreCase));
+            var user = _db.Users.FirstOrDefault(u => u.UserName.ToLower() == userName.ToLower());
             return user == null;
         }
 
         public async Task<UserLoginResponseDTO> Login(UserLoginDTO LoginObject)
         {
             var user = await _db.Users.SingleOrDefaultAsync(u => 
-            string.Equals(u.UserName, LoginObject.UserName, StringComparison.OrdinalIgnoreCase) 
-            && string.Equals(u.Password, LoginObject.Password));
+            u.UserName.ToLower() == LoginObject.UserName.ToLower()
+            && u.Password == LoginObject.Password);
 
 
             if (user == null)
-                return new UserLoginResponseDTO();
+                return null;
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(secretKey);
@@ -69,11 +69,6 @@ namespace Coupon_API.Repository
 
         public async Task<UserDTO> Register(UserRegisterDTO RegisterObject)
         {
-            if (!IsUniqueUser(RegisterObject.UserName))
-            {
-                return new UserDTO();
-            }
-
             var User = _mapper.Map<User>(RegisterObject);
             User.Role = "admin"; // Default role for new users
 
