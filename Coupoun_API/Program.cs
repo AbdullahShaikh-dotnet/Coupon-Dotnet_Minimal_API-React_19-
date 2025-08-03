@@ -4,6 +4,8 @@ using Coupon_API.Data;
 using Coupon_API.EndPoints;
 using Coupon_API.Models;
 using Coupon_API.Models.DTO;
+using Coupon_API.Repository;
+using Coupon_API.Repository.IRepository;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +21,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -50,8 +54,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+//app.UseAuthentication();
+//app.UseAuthorization();
+
+
+
 // ENDPOINTS
 app.MapCouponsCRUDEndpoints();
+app.MapAuthEndpoints();
 
 
 app.Run();
