@@ -14,15 +14,18 @@ namespace Coupon_API.EndPoints
         public static void MapCouponsCRUDEndpoints(this IEndpointRouteBuilder app)
         {
             // Get All Coupon
-            app.MapGet("/api/coupon", GetAllCoupons).WithName("GetCoupons").Produces<APIResponse>(200);
+            app.MapGet("/api/coupon", GetAllCoupons).RequireAuthorization()
+                .WithName("GetCoupons").Produces<APIResponse>(200);
 
 
             // Get Coupon By ID
-            app.MapGet("/api/coupon/{id:int}", GetAllCouponByID).WithName("GetCoupon").Produces<APIResponse>(200);
+            app.MapGet("/api/coupon/{id:int}", GetAllCouponByID).RequireAuthorization()
+                .WithName("GetCoupon").Produces<APIResponse>(200);
 
 
             // Add Coupon
             app.MapPost("/api/coupon", AddCoupon).WithName("CreateCoupons")
+            .RequireAuthorization()
             .Produces<APIResponse>(201)
             .Produces(400)
             .Accepts<CouponCreateDTO>(contentType: "application/json");
@@ -30,13 +33,15 @@ namespace Coupon_API.EndPoints
 
             // Update Coupon
             app.MapPut("/api/coupon", UpdateCoupon).Produces<APIResponse>(200)
+            .RequireAuthorization()
             .Produces(400)
             .Accepts<CouponUpdateDTO>(contentType: "application/json")
             .WithName("UpdateCoupons");
 
 
             // Delete Coupon
-            app.MapDelete("/api/coupon{id:int}", DeleteCoupon).WithName("DeleteCoupon")
+            app.MapDelete("/api/coupon{id:int}", DeleteCoupon).RequireAuthorization()
+            .WithName("DeleteCoupon")
             .Produces<APIResponse>(200)
             .Produces(400);
         }
