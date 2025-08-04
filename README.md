@@ -1,6 +1,6 @@
 # Coupon Minimal API - .NET Core 7.0
 
-A lightweight, clean, and modular **Minimal API** built using **.NET 7**, following RESTful principles, with Entity Framework Core and PostgreSQL support. Ideal for learning or using as a boilerplate for small-scale services.
+A lightweight, clean, and modular **Minimal API** built using **.NET 7**, following RESTful principles, with Entity Framework Core and SQL Server support. Ideal for learning or using as a boilerplate for small-scale services.
 
 ---
 
@@ -16,20 +16,23 @@ A lightweight, clean, and modular **Minimal API** built using **.NET 7**, follow
 - ✅ Standardized response structure  
 - ✅ Logging with Serilog  
 - ✅ Environment-based configuration
+- ✅ Authentication and role base Authourization
 
 ---
 
 ## 📦 Tech Stack
 
-| Layer        | Tech                         |
-|--------------|------------------------------|
-| Backend API  | ASP.NET Core 7 Minimal API   |
-| ORM          | Entity Framework Core        |
-| DB           | SQL Server                   |
-| Validation   | FluentValidation             |
-| Mapping      | AutoMapper                   |
-| Logging      | Serilog                      |
-| Docs         | Swagger / OpenAPI            |
+| Layer          | Tech                         |
+|----------------|------------------------------|
+| Backend API    | ASP.NET Core 7 Minimal API   |
+| ORM            | Entity Framework Core        |
+| DB             | SQL Server                   |
+| Validation     | FluentValidation             |
+| Mapping        | AutoMapper                   |
+| Logging        | Serilog                      |
+| Docs           | Swagger / OpenAPI            |
+| Authentication | JWT                          |
+| Authorization  | Role-base                    |
 
 ---
 
@@ -48,3 +51,8 @@ A lightweight, clean, and modular **Minimal API** built using **.NET 7**, follow
 ```bash
 git clone https://github.com/AbdullahShaikh-dotnet/Coupon_Minimal_API-Dotnet-Core.git
 cd Coupon_Minimal_API-Dotnet-Core
+```
+
+```bash
+update-database
+```
