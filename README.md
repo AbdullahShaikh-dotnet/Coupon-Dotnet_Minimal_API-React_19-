@@ -54,7 +54,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### Prerequisites
 
-- [.NET 7 SDK](https://dotnet.microsoft.com/download/dotnet/7.0)
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - [SQL Server](https://www.microsoft.com/en-in/sql-server/sql-server-downloads?msockid=2038a0d8ff87628a0ce9b53bfe356361)
 - Any IDE (e.g., Visual Studio, Rider, VS Code)
 
