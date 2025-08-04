@@ -70,7 +70,7 @@ namespace Coupon_API.Repository
         public async Task<UserDTO> Register(UserRegisterDTO RegisterObject)
         {
             var User = _mapper.Map<User>(RegisterObject);
-            User.Role = "admin"; // Default role for new users
+            User.Role = "user"; // Default role for new users
 
             await _db.Users.AddAsync(User);
             _db.SaveChanges();

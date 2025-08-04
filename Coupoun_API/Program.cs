@@ -5,6 +5,7 @@ using Coupon_API.Repository;
 using Coupon_API.Repository.IRepository;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -67,21 +68,26 @@ builder.Services.AddAuthentication(option =>
         ValidateAudience = false,
     };
 });
-builder.Services.AddAuthorization();
+
+builder.Services.AddAuthorization(option =>
+    option.AddPolicy("adminOnly",
+        policy => policy.RequireRole("admin")
+    )
+);
+
+
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-    );
+);
 
 builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddProfile<MappingConfig>();
-});
+    cfg.AddProfile<MappingConfig>()
+);
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
-   {
-       options.SerializerOptions.Converters.Add(new DateOnlyJsonConverter());
-   });
+    options.SerializerOptions.Converters.Add(new DateOnlyJsonConverter())
+);
 
 
 var app = builder.Build();

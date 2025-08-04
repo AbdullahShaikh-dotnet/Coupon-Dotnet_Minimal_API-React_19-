@@ -3,6 +3,7 @@ using Coupon_API.Data;
 using Coupon_API.Models;
 using Coupon_API.Models.DTO;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -14,18 +15,18 @@ namespace Coupon_API.EndPoints
         public static void MapCouponsCRUDEndpoints(this IEndpointRouteBuilder app)
         {
             // Get All Coupon
-            app.MapGet("/api/coupon", GetAllCoupons).RequireAuthorization()
+            app.MapGet("/api/coupon", GetAllCoupons)
                 .WithName("GetCoupons").Produces<APIResponse>(200);
 
 
             // Get Coupon By ID
-            app.MapGet("/api/coupon/{id:int}", GetAllCouponByID).RequireAuthorization()
+            app.MapGet("/api/coupon/{id:int}", GetAllCouponByID)
                 .WithName("GetCoupon").Produces<APIResponse>(200);
 
 
             // Add Coupon
             app.MapPost("/api/coupon", AddCoupon).WithName("CreateCoupons")
-            .RequireAuthorization()
+            .RequireAuthorization("adminOnly")
             .Produces<APIResponse>(201)
             .Produces(400)
             .Accepts<CouponCreateDTO>(contentType: "application/json");
@@ -33,14 +34,13 @@ namespace Coupon_API.EndPoints
 
             // Update Coupon
             app.MapPut("/api/coupon", UpdateCoupon).Produces<APIResponse>(200)
-            .RequireAuthorization()
             .Produces(400)
             .Accepts<CouponUpdateDTO>(contentType: "application/json")
             .WithName("UpdateCoupons");
 
 
             // Delete Coupon
-            app.MapDelete("/api/coupon{id:int}", DeleteCoupon).RequireAuthorization()
+            app.MapDelete("/api/coupon{id:int}", DeleteCoupon)
             .WithName("DeleteCoupon")
             .Produces<APIResponse>(200)
             .Produces(400);
@@ -124,7 +124,7 @@ namespace Coupon_API.EndPoints
             return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id }, response);
         }
 
-
+        [Authorize(Roles = "admin")]
         private static async Task<IResult> UpdateCoupon(ApplicationDbContext _db, IMapper mapper, IValidator<CouponUpdateDTO> _validator, [FromBody] CouponUpdateDTO couponUpdate)
         {
             var validationResult = await _validator.ValidateAsync(couponUpdate);
@@ -166,6 +166,7 @@ namespace Coupon_API.EndPoints
         }
 
 
+        [Authorize(Roles = "admin")]
         private static async Task<IResult> DeleteCoupon(ApplicationDbContext _db, IMapper mapper, IValidator<int> validator, int id)
         {
             APIResponse response = new APIResponse();
