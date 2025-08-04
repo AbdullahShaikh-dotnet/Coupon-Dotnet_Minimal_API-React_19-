@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using System.Net.NetworkInformation;
 
 namespace Coupon_API.EndPoints
 {
@@ -21,7 +22,7 @@ namespace Coupon_API.EndPoints
 
             // Get Coupon By ID
             app.MapGet("/api/coupon/{id:int}", GetAllCouponByID)
-                .WithName("GetCoupon").Produces<APIResponse>(200);
+                .WithName("GetCoupon").Produces<APIResponse>(200)
 
 
             // Add Coupon
@@ -42,6 +43,12 @@ namespace Coupon_API.EndPoints
             // Delete Coupon
             app.MapDelete("/api/coupon{id:int}", DeleteCoupon)
             .WithName("DeleteCoupon")
+            .Produces<APIResponse>(200)
+            .Produces(400);
+
+
+            app.MapGet("/api/coupon/search", SearchCoupon)
+            .WithName("SearchCoupon")
             .Produces<APIResponse>(200)
             .Produces(400);
         }
@@ -193,6 +200,33 @@ namespace Coupon_API.EndPoints
             response.StatusCode = HttpStatusCode.OK;
 
             return Results.CreatedAtRoute("GetCoupon", new { id }, response);
+        }
+
+
+        private static async Task<IResult> SearchCoupon([AsParameters] SearchCoupon search, 
+            ApplicationDbContext _db, IMapper mapper, IValidator<SearchCoupon> _validator)
+        {
+            APIResponse response = new APIResponse();
+            var validorSearchCoupon = await _validator.ValidateAsync(search);
+
+            if (!validorSearchCoupon.IsValid)
+            {
+                response.ErrorMessages = validorSearchCoupon.Errors.Select(error => error.ErrorMessage).ToList();
+                return Results.BadRequest(response);
+            }
+
+
+            var coupons = await _db.Coupons
+                .Where(c => c.Name.Contains(search.CouponName) && c.DeleteId == null)
+                .Skip((search.PageNumber - 1) * search.PageSize)
+                .Take(search.PageSize)
+                .ToListAsync();
+
+            response.Result = mapper.Map<IEnumerable<CouponDTO>>(coupons);
+            response.StatusCode = HttpStatusCode.OK;
+            response.IsSuccess = true;
+
+            return Results.Ok(response);
         }
     }
 }
