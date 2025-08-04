@@ -1,6 +1,20 @@
-# Coupon Minimal API - .NET Core 7.0
 
-A lightweight, clean, and modular **Minimal API** built using **.NET 7**, following RESTful principles, with Entity Framework Core and SQL Server support. Ideal for learning or using as a boilerplate for small-scale services.
+# Coupon Minimal API - .NET Core 9.0
+
+![.NET Core Version](https://img.shields.io/badge/.NET%20Core-9.0-blue)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
+![Stars](https://img.shields.io/github/stars/AbdullahShaikh-dotnet/Coupon_Minimal_API-Dotnet-Core?style=social)
+![Forks](https://img.shields.io/github/forks/AbdullahShaikh-dotnet/Coupon_Minimal_API-Dotnet-Core?style=social)
+
+
+## 🧾 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+## 📝 Highlights
+
+⌞A lightweight, clean, and modular **Minimal API** built using **.NET 9**, following RESTful principles, with Entity Framework Core and SQL Server support. Ideal for learning or using as a boilerplate for small-scale services.⌝
 
 ---
 
@@ -53,6 +67,7 @@ git clone https://github.com/AbdullahShaikh-dotnet/Coupon_Minimal_API-Dotnet-Cor
 cd Coupon_Minimal_API-Dotnet-Core
 ```
 
+2. **Create Database and Table from Migration File**
 ```bash
 update-database
 ```
