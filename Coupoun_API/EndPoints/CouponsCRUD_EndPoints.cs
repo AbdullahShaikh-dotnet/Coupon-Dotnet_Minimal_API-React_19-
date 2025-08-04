@@ -23,6 +23,14 @@ namespace Coupon_API.EndPoints
             // Get Coupon By ID
             app.MapGet("/api/coupon/{id:int}", GetAllCouponByID)
                 .WithName("GetCoupon").Produces<APIResponse>(200)
+                .AddEndpointFilter(async (context, next) =>
+                {
+                    int id = context.GetArgument<int>(4);
+                    if(id <= 0)
+                        return Results.BadRequest("Id must be greater than 0");
+
+                    return await next(context);
+                });
 
 
             // Add Coupon
