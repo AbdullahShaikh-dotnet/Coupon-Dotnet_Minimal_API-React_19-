@@ -20,7 +20,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🚀 Features
 
-- ✅ .NET 7 Minimal API architecture  
+- ✅ .NET 9 Minimal API architecture  
 - ✅ SQL Server integration using EF Core  
 - ✅ Repository Pattern  
 - ✅ AutoMapper for DTO mapping  
@@ -38,7 +38,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 | Layer          | Tech                         |
 |----------------|------------------------------|
-| Backend API    | ASP.NET Core 7 Minimal API   |
+| Backend API    | ASP.NET Core 9 Minimal API   |
 | ORM            | Entity Framework Core        |
 | DB             | SQL Server                   |
 | Validation     | FluentValidation             |
