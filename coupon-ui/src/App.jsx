@@ -22,8 +22,16 @@ function App() {
             }
         }
 
-        fetchCoupons();
-    }, []);
+
+        const timeOut = setTimeout(() => {
+            fetchCoupons();
+        }, 3000)
+
+        return () => {
+            clearTimeout(timeOut)
+        }
+
+    }, [count]);
 
     return (
         <>
@@ -50,12 +58,17 @@ function App() {
 
 
             <h1>Coupons</h1>
+            <div>
+                {coupons.length === 0 && <h2>Loading...</h2>}
+            </div>
+
             {error && <p style={{ color: 'red' }}>Error: {error}</p>}
             <ul>
                 {Array.isArray(coupons) && coupons.map((coupon, idx) => (
-                    <li key={idx}>{coupon.name} - {coupon.percentage}%</li>
+                    <li key={idx}>{coupon.name} - {coupon.percentage}% (Code : {coupon.couponCode})</li>
                 ))}
             </ul>
+
 
         </>
     )
