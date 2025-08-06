@@ -16,7 +16,7 @@ function App() {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const apiResponse = await response.json();
-                setCoupons(apiResponse.result); // assuming your API returns { result: [...] }
+                setCoupons(apiResponse.result);
             } catch (err) {
                 setError(err.message);
             }
