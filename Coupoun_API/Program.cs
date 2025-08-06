@@ -89,6 +89,18 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
     options.SerializerOptions.Converters.Add(new DateOnlyJsonConverter())
 );
 
+// To Use from React (CORS Configuration)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowViteDev", policy =>
+    {
+        policy.WithOrigins("http://localhost:59436") // Vite dev server
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+
 
 var app = builder.Build();
 
@@ -99,6 +111,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// To Use from React (CORS Setup)
+app.UseCors("AllowViteDev");
 
 app.UseHttpsRedirection();
 
