@@ -97,7 +97,7 @@ namespace Coupon_API.EndPoints
 
             var coupon = mapper.Map<CouponDTO>(couponDB);
 
-            response.Result = coupon;
+            response.Result = new List<CouponDTO> { coupon };
             response.IsSuccess = true;
             response.StatusCode = HttpStatusCode.OK;
 
