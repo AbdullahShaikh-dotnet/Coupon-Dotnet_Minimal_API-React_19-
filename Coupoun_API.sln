@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36310.24
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coupon_API", "Coupoun_API\Coupon_API.csproj", "{7EA48013-07CC-40C5-84B0-71678311FA8C}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "coupon-ui", "Coupon-UI\coupon-ui.esproj", "{EEB3803D-38C6-350D-30C3-CE7BA1918D43}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Coupon-UI", "Coupon-UI\Coupon-UI.esproj", "{EEB3803D-38C6-350D-30C3-CE7BA1918D43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
