@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
 
-const Login = ({ onLogin }) => {
+
+const Login = () => {
   return (
-
+      <h1>Login</h1>
   );
 
 };
