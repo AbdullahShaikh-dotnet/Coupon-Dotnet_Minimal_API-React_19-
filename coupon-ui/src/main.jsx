@@ -1,41 +1,45 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import {
-    createBrowserRouter,
-    RouterProvider,
-    Outlet
-} from "react-router";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router";
 import Login from './Components/Login';
 import Register from './Components/Register';
+import Error from './Components/Error';
+import userContext from '../src/Utility/UserContext'
 
-
-
-
-// eslint-disable-next-line react-refresh/only-export-components
 const AppLayout = () => {
     return <>
-        <h1 className='text-xl text-green-400'></h1>
-        <Outlet />
+        <userContext.Provider value={{ user: null, setUser: () => {}, isLoggedIn: false }}>
+            <Outlet />
+        </userContext.Provider>
     </>
 }
+
 
 const router = createBrowserRouter([
     {
         path: "/",
+        element: <Login />,
+        errorElement: <Error />
+    },
+    {
+        path: "/login",
+        element: <Login />,
+    },
+    {
+        path: "/Register",
+        element: <Register />,
+    },
+    {
+        path: "/main",
         element: <AppLayout />,
         children: [
             {
-                path: "/Login",
-                element: <Login />,
-            },
-
-            {
-                path: "/Register",
+                path: "/main/register",
                 element: <Register />,
             },
         ]
-    },
+    }
 ]);
 
 const root = createRoot(document.getElementById('root'));
