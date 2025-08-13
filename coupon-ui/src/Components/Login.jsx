@@ -1,11 +1,71 @@
+import { useContext, useEffect, useState } from "react";
+import userContext from "../Utility/UserContext";
+import { useNavigate } from "react-router";
+
 const Login = () => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [rememberMe, setRememberMe] = useState(false);
+    const { user, setUser } = useContext(userContext);
+    let navigate = useNavigate();
+
+    useEffect(() => {
+        // Validate if user is already logged in by using token saved in localStorage
+        // const token = localStorage.getItem('token');
+        // if (token) {
+        //     navigate("/main");
+        // } else {
+        //     setUser(null);
+        // }
+
+    }, []);
+
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+
+        const loginRequest = async (url) => {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            return res.ok ? res.json() : null;
+        };
+
+        let data = await loginRequest('/API/Login') || await loginRequest('/api/login');
+        
+        if (!data || data.isSuccess === false) {
+            alert(data?.errorMessages?.join(', ') || 'Login failed');
+            setUser(null);
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            return;
+        }
+
+        setUser(data.result);
+        
+        
+        if (rememberMe) {
+            localStorage.setItem('username', username);
+            localStorage.setItem('token', data.result.token);
+        }
+
+        localStorage.setItem('isLoggedIn', true);
+        setUsername('');
+        setPassword('');
+        setRememberMe(false);
+        navigate("/main");
+    };
+
+
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex items-center justify-center min-h-screen bg-white">
             {/* Card */}
-            <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
                 {/* Card Header */}
-                <div className="bg-gradient-to-r from-gray-700 to-gray-900 h-28 flex items-center justify-center">
-                    <h2 className="text-3xl font-bold text-white">Sign In</h2>
+                <div className="h-28 flex items-center justify-center">
+                    <h2 className="text-3xl font-bold text-slate-900">Sign In</h2>
                 </div>
 
                 {/* Card Body */}
@@ -15,6 +75,7 @@ const Login = () => {
                             Username
                         </label>
                         <input
+                            onKeyUp={(e) => { setUsername(e.target.value) }}
                             type="text"
                             placeholder="Enter your username"
                             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-gray-700 focus:border-gray-700 outline-none"
@@ -26,6 +87,7 @@ const Login = () => {
                             Password
                         </label>
                         <input
+                            onKeyUp={(e) => { setPassword(e.target.value) }}
                             type="password"
                             placeholder="Enter your password"
                             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-gray-700 focus:border-gray-700 outline-none"
@@ -35,6 +97,7 @@ const Login = () => {
                     <div className="flex items-center justify-between">
                         <label className="flex items-center text-sm text-gray-600 cursor-pointer">
                             <input
+                                onChange={(e) => { setRememberMe(e.target.checked) }}
                                 type="checkbox"
                                 className="peer hidden"
                             />
@@ -62,9 +125,9 @@ const Login = () => {
 
                 {/* Card Footer */}
                 <div className="px-6 pb-6">
-                    <button
+                    <button onClick={(e) => handleLogin(e)}
                         type="submit"
-                        className="w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white py-2 rounded-lg hover:opacity-90 transition"
+                        className="cursor-pointer w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white py-2 rounded-lg hover:opacity-90 transition"
                     >
                         Sign In
                     </button>
