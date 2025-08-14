@@ -3,13 +3,16 @@ using Coupon_API.Data;
 using Coupon_API.EndPoints;
 using Coupon_API.Repository;
 using Coupon_API.Repository.IRepository;
+using Coupon_API.Utilities;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +20,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
+
+
+// Custom Rate Limiter Configuration
+builder.Services.AddCustomRateLimiter();
+
+
 builder.Services.AddSwaggerGen(option =>
 {
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -115,12 +124,14 @@ if (app.Environment.IsDevelopment())
 // To Use from React (CORS Setup)
 app.UseCors("AllowViteDev");
 
+
 app.UseHttpsRedirection();
 
 
+app.UseRateLimiter();
+
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 
 // ENDPOINTS
