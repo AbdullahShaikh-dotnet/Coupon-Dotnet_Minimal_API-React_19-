@@ -8,6 +8,7 @@ import Error from './Components/Error';
 import userContext from '../src/Utility/UserContext'
 import Home from './Components/Home';
 import Header from './Components/Header';
+import About from './Components/About';
 
 const AppLayout = () => {
     const [user, setUser] = useState(null);
@@ -21,7 +22,7 @@ const AppLayout = () => {
 
     return <>
         <userContext.Provider value={{ user, setUser, isLoggedIn: !!user }}>
-            <Header/>
+            <Header />
             <Outlet />
         </userContext.Provider>
     </>
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
             {
                 path: "/main/home",
                 element: <Home />,
+            },
+            {
+                path: "/main/about",
+                element: <About />,
             },
         ]
     }
