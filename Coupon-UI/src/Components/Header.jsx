@@ -1,12 +1,14 @@
-import { useState } from "react";
-import { useLocation } from "react-router";
-import { 
-  HomeIcon, 
-  InformationCircleIcon, 
-  BriefcaseIcon, 
-  PhoneIcon, 
-  Bars3Icon, 
-  XMarkIcon 
+import { useState, useContext } from "react";
+import { useLocation, useNavigate } from "react-router";
+import UserContext from '../Utility/UserContext';
+import {
+  HomeIcon,
+  InformationCircleIcon,
+  BriefcaseIcon,
+  PhoneIcon,
+  Bars3Icon,
+  XMarkIcon,
+  UserCircleIcon
 } from "@heroicons/react/24/outline";
 import {
   Sheet,
@@ -14,17 +16,21 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"; // shadcn sheet
 import { Button } from "@/components/ui/button";
+import Icon from '../assets/Icon.png';
 
 const navLinks = [
   { name: "Home", path: "/main/home", icon: <HomeIcon className="w-5 h-5" /> },
-  { name: "About", path: "/about", icon: <InformationCircleIcon className="w-5 h-5" /> },
+  { name: "About", path: "/main/about", icon: <InformationCircleIcon className="w-5 h-5" /> },
   { name: "Services", path: "/services", icon: <BriefcaseIcon className="w-5 h-5" /> },
   { name: "Contact", path: "/contact", icon: <PhoneIcon className="w-5 h-5" /> },
 ];
 
 const Header = () => {
   const location = useLocation();
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
 
+  console.log("User in Header:", user);
   const linkClass = (path) =>
     location.pathname === path
       ? "text-slate-600 border-b-2 border-slate-600 font-medium"
@@ -34,9 +40,12 @@ const Header = () => {
     <header className="bg-white shadow-sm fixed w-full z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          
+
           {/* Logo */}
-          <div className="text-lg font-semibold text-gray-800">Coupons</div>
+          <div className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <img src={Icon} alt="Logo" className="size-10" />
+            Kup-ons
+          </div>
 
           {/* Desktop Menu */}
           <nav className="hidden md:flex space-x-6">
@@ -50,7 +59,21 @@ const Header = () => {
                 {link.name}
               </a>
             ))}
+
           </nav>
+
+
+          <Button
+            variant="ghost"
+            onClick={() => navigate(user?.user == null ? "/login" : "/main/profile")}
+            className="hidden md:flex items-center gap-2 border"
+          >
+            <span className="flex items-center gap-2">
+              <UserCircleIcon className="w-6 h-6" />
+              {user?.user ? `Welcome, ${user.user.name}` : "Login"}
+            </span>
+          </Button>
+
 
           {/* Mobile Menu */}
           <Sheet>
@@ -77,6 +100,18 @@ const Header = () => {
                     {link.name}
                   </a>
                 ))}
+
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate(user?.user == null ? "/login" : "/main/profile")}
+                  className="items-center gap-2 border"
+                >
+                  <span className="flex items-center gap-2">
+                    <UserCircleIcon className="w-6 h-6" />
+                    {user?.user ? `Welcome, ${user.user.name}` : "Login"}
+                  </span>
+                </Button>
+
               </nav>
             </SheetContent>
           </Sheet>
