@@ -10,7 +10,7 @@ const Error = () => {
                 <p className="text-white font-semibold text-xl">Please check the URL or try again later.</p>
             </div>
 
-            <Link to={"/"}>
+            <Link to={"/main/home"}>
                 <div className="bg-white p-1 rounded-md px-4 text-md font-semibold text-gray-600">Back to Home</div>
             </Link>
         </div>
