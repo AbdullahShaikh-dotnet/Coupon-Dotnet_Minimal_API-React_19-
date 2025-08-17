@@ -1,6 +1,8 @@
 import { useContext } from "react";
 import { useLocation, useNavigate, Link } from "react-router";
 import UserContext from "../Utility/UserContext";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"; // shadcn sheet
+import { Button } from "@/components/ui/button";
 import {
   HomeIcon,
   InformationCircleIcon,
@@ -10,11 +12,10 @@ import {
   UserCircleIcon,
   ArrowLeftStartOnRectangleIcon,
   BanknotesIcon,
+  TagIcon,
+  SunIcon,
+  MoonIcon,
 } from "@heroicons/react/24/outline";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"; // shadcn sheet
-import { Button } from "@/components/ui/button";
-import Icon from "../assets/Icon.png";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -60,8 +61,8 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-            <img src={Icon} alt="Logo" className="size-10" />
+          <div className="text-lg font-semibold text-gray-600 flex items-center gap-2">
+            <TagIcon className="h-8 w-8" />
             Kup-ons
           </div>
 
@@ -102,6 +103,11 @@ const Header = () => {
                   <DropdownMenuItem>
                     <BanknotesIcon className="w-4 h-4 mr-2" />
                     Billing
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem>
+                    <SunIcon className="w-4 h-4 mr-2" />
+                    Light Mode
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
@@ -160,6 +166,10 @@ const Header = () => {
                       <DropdownMenuItem>
                         <BanknotesIcon className="w-4 h-4 mr-2" />
                         Billing
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <MoonIcon className="w-4 h-4 mr-2" />
+                        Light Mode
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
