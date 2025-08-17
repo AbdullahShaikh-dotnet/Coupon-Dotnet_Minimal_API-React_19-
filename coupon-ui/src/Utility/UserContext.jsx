@@ -1,9 +1,9 @@
 import { createContext } from "react";
 
-const userContext = createContext({
+const UserContext = createContext({
     user: null,
     setUser: () => {},
     isLoggedIn: false,
 });
 
-export default userContext;
+export default UserContext;
