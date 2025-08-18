@@ -1,4 +1,4 @@
-import { useState, useContext, useCallback, useEffect } from "react";
+import React,{ useState, useContext, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
 import userContext from "../Utility/UserContext";
 import {
@@ -14,13 +14,14 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import useLoader from "@/Utility/useLoader";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const progress = useLoader(isLoading);
   const { setUser } = useContext(userContext);
   const navigate = useNavigate();
 
@@ -39,93 +40,80 @@ const Login = () => {
     }
   }, [setUser, navigate]);
 
-  // Animate progress while loading
-  useEffect(() => {
-    if (isLoading) {
-      setProgress(0);
-      const timer = setInterval(() => {
-        setProgress((prev) => {
-          // slowly increment until ~90%
-          if (prev >= 90) return prev;
-          return prev + 1;
+  const loginRequest = useCallback(
+    async (url) => {
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
         });
-      }, 400);
-      return () => clearInterval(timer);
-    } else {
-      setProgress(0);
-    }
-  }, [isLoading]);
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        return await res.json();
+      } catch (err) {
+        console.error("Login request failed:", err);
+        toast.error("Login request failed. Please try again.");
+        return null;
+      }
+    },
+    [username, password]
+  );
 
-  const loginRequest = useCallback(async (url) => {
-    try {
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-      return await res.json();
-    } catch (err) {
-      console.error("Login request failed:", err);
-      toast.error("Login request failed. Please try again.");
-      return null;
-    }
-  }, [username, password]);
+  const handleLogin = useCallback(
+    async (e) => {
+      e.preventDefault();
 
-  const handleLogin = useCallback(async (e) => {
-    e.preventDefault();
-
-    if (!username.trim() || !password.trim()) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      let data =
-        (await loginRequest("/api/Login")) ||
-        (await loginRequest("/API/login"));
-
-      if (!data || data.isSuccess === false) {
-        const errorMessage =
-          data?.errorMessages?.join(", ") ||
-          "Login failed. Please check your credentials.";
-        toast.error(errorMessage);
-
-        setUser(null);
-        localStorage.removeItem("token");
-        localStorage.removeItem("username");
-        localStorage.removeItem("user");
-        localStorage.removeItem("isLoggedIn");
+      if (!username.trim() || !password.trim()) {
+        toast.error("Please fill in all fields");
         return;
       }
 
-      setUser(data.result);
-      localStorage.setItem("user", JSON.stringify(data.result));
+      setIsLoading(true);
 
-      if (rememberMe) {
-        localStorage.setItem("username", username);
-        localStorage.setItem("token", data.result.token);
+      try {
+        let data =
+          (await loginRequest("/api/Login")) ||
+          (await loginRequest("/API/login"));
+
+        if (!data || data.isSuccess === false) {
+          const errorMessage =
+            data?.errorMessages?.join(", ") ||
+            "Login failed. Please check your credentials.";
+          toast.error(errorMessage);
+
+          setUser(null);
+          localStorage.removeItem("token");
+          localStorage.removeItem("username");
+          localStorage.removeItem("user");
+          localStorage.removeItem("isLoggedIn");
+          return;
+        }
+
+        setUser(data.result);
+        localStorage.setItem("user", JSON.stringify(data.result));
+
+        if (rememberMe) {
+          localStorage.setItem("username", username);
+          localStorage.setItem("token", data.result.token);
+        }
+        localStorage.setItem("isLoggedIn", "true");
+
+        toast.success("Login successful! Redirecting...");
+
+        // Wait briefly to show full progress before navigating
+        setTimeout(() => {
+          setIsLoading(false);
+          navigate("/main/home");
+        }, 800);
+      } catch (err) {
+        console.error("Login error:", err);
+        toast.error("An unexpected error occurred. Please try again.");
+      } finally {
+        setTimeout(() => setIsLoading(false), 500);
       }
-      localStorage.setItem("isLoggedIn", "true");
-
-      toast.success("Login successful! Redirecting...");
-      setProgress(100);
-
-      setTimeout(() => {
-        setIsLoading(false);
-        navigate("/main/home");
-      }, 800);
-
-    } catch (err) {
-      console.error("Login error:", err);
-      toast.error("An unexpected error occurred. Please try again.");
-    } finally {
-      // If login fails quickly, allow animation to finish gracefully
-      setTimeout(() => setIsLoading(false), 500);
-    }
-  }, [username, password, rememberMe, loginRequest, setUser, navigate]);
+    },
+    [username, password, rememberMe, loginRequest, setUser, navigate]
+  );
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
@@ -165,7 +153,7 @@ const Login = () => {
                 <Checkbox
                   id="remember"
                   checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked)}
+                  onCheckedChange={(checked) => setRememberMe(!!checked)}
                   disabled={isLoading}
                 />
                 <Label htmlFor="remember" className="text-sm">
