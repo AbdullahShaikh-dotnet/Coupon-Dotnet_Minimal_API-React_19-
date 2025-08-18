@@ -1,75 +1,51 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from "react";
 import UserContext from "../Utility/UserContext";
-import useCouponsData from "../Utility/useCouponsData"
+import useCouponsData from "../Utility/useCouponsData";
+import { columns } from "@/Components/Coupons-Datatable/CouponsColumns";
+import { CouponsDataTable } from "@/Components/Coupons-Datatable/CouponsDatatable";
+import { toast } from "sonner";
 
 const Home = () => {
     const { user } = useContext(UserContext);
-    const { data, error } = useCouponsData();
+    const { data, error, isLoading } = useCouponsData();
 
-    type Coupon = Readonly<{
-        id: number
-        name: string
-        couponCode: string
-        percentage: number
-        expireDate: Date
-        createDate: Date
-        isActive: boolean
-    }>
-
-
-
-    let coupons: Coupon[] = [
-        {
-            id: 1,
-            name: "Summer Sale",
-            couponCode: "SUMMER20",
-            percentage: 20,
-            expireDate: new Date("2025-09-01"),
-            createDate: new Date(),
-            isActive: true
-        },
-        {
-            id: 2,
-            name: "Monsoon Sale",
-            couponCode: "MONSOON20",
-            percentage: 30,
-            expireDate: new Date("2025-09-01"),
-            createDate: new Date(),
-            isActive: true
+    useEffect(() => {
+        if (error) {
+            toast.error("Error", {
+                duration: 5000,
+                dismissible: true,
+                description: error.message,
+            });
         }
-    ]
+    }, [error]);
 
-
-    console.log(data);
-    console.log("User in Home:", user);
-    /*debugger;*/
-
-    return <>
-        <div className="pt-16">
-            <h1 className="text-2xl font-bold">Home</h1>
-            <div className='grid grid-flow-col grid-rows-1 gap-1'>
-                {
-                    Object.keys(coupons[0]).map((column, index) => (
-
-                        <h1 key={index} className='font-semibold'>{column.toUpperCase()}</h1>
-
-                    ))
-                }
+    return (
+        <div className="pt-25 px-4 max-w-7xl mx-auto">
+            <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold mb-1">
+                        Coupons
+                    </h1>
+                    <p className="text-muted-foreground">
+                        Here are your latest coupons and offers.
+                    </p>
+                </div>
             </div>
-            {
-                coupons.map((coupon, index) => (
-                    <div key={index} className='grid grid-flow-col grid-rows-1 gap-1'>
-                        {
-                            Object.values(coupon).map((data, i) => (
-                                <h1 key={i}>{data instanceof Date ? data.toLocaleDateString() : data}</h1>
-                            ))
-                        }
+            <div className="bg-card rounded-xl shadow p-6">
+                <h2 className="text-xl font-semibold mb-4"></h2>
+                {isLoading ? (
+                    <div className="flex justify-center items-center h-32">
+                        <span className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></span>
+                        <span className="ml-3 text-muted-foreground">
+                            Loading coupons...
+                        </span>
                     </div>
-                )
-                )
-            }
+                ) : (
+                    <CouponsDataTable data={data} columns={columns} />
+                )}
+            </div>
         </div>
-    </>
-}
+    );
+};
 
 export default Home;
