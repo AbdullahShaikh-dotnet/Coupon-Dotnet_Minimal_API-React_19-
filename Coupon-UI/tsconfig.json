@@ -12,6 +12,8 @@
     "noEmit": true,
     "strict": true,
     "skipLibCheck": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "allowJs": true,      // <-- allows importing .js / .jsx
+    "checkJs": false      // <-- prevents TypeScript from type-checking plain JS
   }
 }
