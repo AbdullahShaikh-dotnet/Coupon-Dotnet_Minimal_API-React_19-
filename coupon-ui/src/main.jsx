@@ -8,6 +8,7 @@ import Error from "./Components/Error";
 import Home from "./Components/Home";
 import About from "./Components/About";
 import AppLayout from "./Components/AppLayout";
+import { Toaster } from "@/components/ui/sonner";
 
 const router = createBrowserRouter([
   {
@@ -46,5 +47,8 @@ const router = createBrowserRouter([
 const root = createRoot(document.getElementById("root"));
 
 root.render(
-    <RouterProvider router={router} />
+    <StrictMode>
+        <Toaster richColors closeButton />
+        <RouterProvider router={router} />
+    </StrictMode>
 );
