@@ -6,6 +6,14 @@ import { CouponsDataTable } from "@/Components/Coupons-Datatable/CouponsDatatabl
 import { toast } from "sonner";
 import useLoader from "@/Utility/useLoader";
 import { Progress } from "@/components/ui/progress";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 
 const Home = () => {
   const { user } = useContext(UserContext);
@@ -22,29 +30,29 @@ const Home = () => {
     }
   }, [error]);
 
-  return (
-    <div className="pt-25 px-4 max-w-7xl mx-auto">
-      <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold mb-1">Coupons</h1>
-          <p className="text-muted-foreground">
-            Here are your latest coupons and offers.
-          </p>
-        </div>
+  return isLoading ?
+    (<div className="flex items-center justify-center w-screen h-screen bg-white">
+      <div className="w-64">
+        <Progress value={progress} className="w-full" />
       </div>
-      <div className="bg-card rounded-xl shadow p-6">
-        <h2 className="text-xl font-semibold mb-4"></h2>
-        {isLoading ? (
-          <div className="flex flex-col items-center w-full">
-            <Progress value={progress} className="w-full" />
-            <p className="text-sm mt-2 text-gray-500">Loading...</p>
-          </div>
-        ) : (
-          <CouponsDataTable data={data} columns={columns} />
-        )}
+    </div>) :
+    (
+      <div className="pt-30 px-4 max-w-7xl mx-auto">
+        <Card >
+          <CardHeader>
+            <Label className="text-3xl font-bold mb-1">
+              Coupons
+            </Label>
+            <Label className="text-xs text-muted-foreground">
+              Here are your latest coupons and offers.
+            </Label>
+          </CardHeader>
+          <CardContent>
+            <CouponsDataTable data={data} columns={columns} />
+          </CardContent>
+        </Card>
       </div>
-    </div>
-  );
+    );
 };
 
 export default Home;
