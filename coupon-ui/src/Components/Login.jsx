@@ -97,9 +97,7 @@ const Login = () => {
           localStorage.setItem("token", data.result.token);
         }
         localStorage.setItem("isLoggedIn", "true");
-
-        toast.success("Login successful! Redirecting...");
-
+        
         // Wait briefly to show full progress before navigating
         setTimeout(() => {
           setIsLoading(false);
