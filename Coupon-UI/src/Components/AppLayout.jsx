@@ -28,7 +28,7 @@ const AppLayout = () => {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center w-screen h-screen bg-gray-100">
+      <div className="flex items-center justify-center w-screen h-screen bg-white">
         <div className="w-64">
           <Progress value={progress} className="w-full" />
         </div>
