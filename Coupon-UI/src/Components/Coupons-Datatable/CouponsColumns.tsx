@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table"
-import { Checkbox } from "@/Components/ui/checkbox"
-import { Button } from "@/Components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button"
 
 export type TCoupon = Readonly<{
   id: number
@@ -51,10 +51,10 @@ export const columns: ColumnDef<TCoupon>[] = [
   },
   {
     accessorKey: "isActive",
-    header: "Active?",
-    enableSorting: true,
+    header: "IsActive?",
+    enableSorting: false,
     cell: ({ getValue }) => (
-      <Checkbox checked={getValue() as boolean} disabled />
+      <Checkbox checked={getValue() as boolean} />
     ),
   },
 ]
