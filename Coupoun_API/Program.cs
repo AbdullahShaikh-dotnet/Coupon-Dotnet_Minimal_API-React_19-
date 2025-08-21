@@ -9,12 +9,26 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+///<summary>
+/// Below chain builds config from multiple sources in this order:
+/// appsettings.json, User Secrets, Env Variables
+/// UserSecrets Path : C:\Users\[USerName]\AppData\Roaming\Microsoft\UserSecrets\51d0634e-c8b6-4026-94c1-5443f893aadd\Secret.json
+/// This GUID(51d0634e-c8b6-4026-94c1-5443f893aadd) Added in .csproj file <UserSecretsId>51d0634e-c8b6-4026-94c1-5443f893aadd</UserSecretsId>
+///</summary>
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false)
+    .AddUserSecrets<Program>() // This line is critical
+    .AddEnvironmentVariables();
+
 
 builder.AddServiceDefaults();
 
@@ -92,7 +106,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 );
 
 builder.Services.AddAutoMapper(cfg =>
-    cfg.AddProfile<MappingConfig>()
+{
+    cfg.AddProfile<MappingConfig>();
+    cfg.LicenseKey = builder.Configuration.GetValue<string>("AutoMapper:key");
+}
 );
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
