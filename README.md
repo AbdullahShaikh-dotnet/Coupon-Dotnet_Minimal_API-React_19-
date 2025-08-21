@@ -39,18 +39,18 @@ This repository demonstrates clean architecture, RESTful principles, authenticat
 
 ## 📦 Tech Stack
 
-| Layer          | Tech                         |
-|----------------|------------------------------|
-| **Backend API** | ASP.NET Core 9 Minimal API   |
-| **ORM**         | Entity Framework Core        |
-| **Database**    | SQL Server                   |
-| **Validation**  | FluentValidation             |
-| **Mapping**     | AutoMapper                   |
-| **Logging**     | Serilog                      |
-| **Docs**        | Swagger / OpenAPI            |
-| **Auth**        | JWT + Role-based             |
-| **Orchestration** | .NET Aspire                 |
-| **UI**          | React 19 + Shadcn UI         |
+| Layer              | Tech                         |
+|--------------------|------------------------------|
+| **Backend API**    | ASP.NET Core 9 Minimal API   |
+| **ORM**            | Entity Framework Core        |
+| **Database**       | SQL Server                   |
+| **Validation**     | FluentValidation             |
+| **Mapping**        | AutoMapper                   |
+| **Logging**        | Serilog                      |
+| **Docs**           | Swagger / OpenAPI            |
+| **Auth**           | JWT + Role-based             |
+| **Orchestration**  | .NET Aspire                  |
+| **UI**             | React 19 + Shadcn UI         |
 
 ---
 
@@ -72,11 +72,13 @@ This repository demonstrates clean architecture, RESTful principles, authenticat
 
 2. **Apply migrations and create database**
    ```bash
-   update-database```
+   update-database
+   ```
    
 3. **Install npm dependency**
    ```bash
-   npm install```
+   npm install
+   ```
 
 4. **Add Auth Key and Automapper License Key in appsettings.json**
 
