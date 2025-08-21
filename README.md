@@ -1,5 +1,5 @@
 
-# Coupon Minimal API - .NET Core 9.0
+# Coupon Minimal API + React - .NET Core 9.0 & React 19
 
 ![.NET Core Version](https://img.shields.io/badge/.NET%20Core-9.0-blue)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
