@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coupon_API", "Coupoun_API\C
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Coupon-UI", "Coupon-UI\Coupon-UI.esproj", "{EEB3803D-38C6-350D-30C3-CE7BA1918D43}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coupoun_API.AppHost", "Coupoun_API.AppHost\Coupoun_API.AppHost.csproj", "{9AF8AA2E-EED3-4108-B21D-A668929EF711}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coupoun_API.ServiceDefaults", "Coupoun_API.ServiceDefaults\Coupoun_API.ServiceDefaults.csproj", "{797E253D-F9E4-2294-DA13-2B40717C229E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +27,14 @@ Global
 		{EEB3803D-38C6-350D-30C3-CE7BA1918D43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEB3803D-38C6-350D-30C3-CE7BA1918D43}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EEB3803D-38C6-350D-30C3-CE7BA1918D43}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{9AF8AA2E-EED3-4108-B21D-A668929EF711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AF8AA2E-EED3-4108-B21D-A668929EF711}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AF8AA2E-EED3-4108-B21D-A668929EF711}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AF8AA2E-EED3-4108-B21D-A668929EF711}.Release|Any CPU.Build.0 = Release|Any CPU
+		{797E253D-F9E4-2294-DA13-2B40717C229E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{797E253D-F9E4-2294-DA13-2B40717C229E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{797E253D-F9E4-2294-DA13-2B40717C229E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{797E253D-F9E4-2294-DA13-2B40717C229E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

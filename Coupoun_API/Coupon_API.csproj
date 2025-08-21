@@ -26,4 +26,8 @@
     <PackageReference Include="ZLinq" Version="1.5.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Coupoun_API.ServiceDefaults\Coupoun_API.ServiceDefaults.csproj" />
+  </ItemGroup>
+
 </Project>
