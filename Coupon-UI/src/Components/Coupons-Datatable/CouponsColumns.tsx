@@ -67,7 +67,7 @@ export const columns: ColumnDef<TCoupon>[] = [
             const id = row.original.id;
             return (
                 <div className="flex justify-around">
-                    <Link to={`/main/edit?id=${id}`}>
+                    <Link to={`/main/coupon/edit/${id}`}>
                         <Pencil className="h-4 w-4 cursor-pointer" />
                     </Link>
                     <Link to={`/main/delete?id=${id}`}>
