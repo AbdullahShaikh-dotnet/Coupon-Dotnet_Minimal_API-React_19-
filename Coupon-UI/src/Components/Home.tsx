@@ -32,7 +32,7 @@ const Home = () => {
     const { user } = useContext(UserContext);
     const { data, error, isLoading } = useCouponsData();
     const progress = useLoader(isLoading);
-    const [isCardViewVisible, setCardViewVisible] = useState(false);
+    const [isCardViewVisible, setCardViewVisible] = useState(true);
 
     const formatDate = (date: Date) => {
         const DATE = new Date(date);
@@ -106,7 +106,7 @@ const Home = () => {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="start">
                                                     <DropdownMenuItem>
-                                                        <Link to={`/main/edit?id=${d.id}`} className="flex gap-6">
+                                                        <Link to={`/main/coupon?operation=edit&id=${d.id}`} className="flex gap-6">
                                                             <Pencil className="h-4 w-4 cursor-pointer" />
                                                             Edit
                                                         </Link>
