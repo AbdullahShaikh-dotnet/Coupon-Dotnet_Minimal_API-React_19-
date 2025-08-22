@@ -9,6 +9,7 @@ import Home from "./Components/Home";
 import About from "./Components/About";
 import AppLayout from "./Components/AppLayout";
 import { Toaster } from "@/components/ui/sonner";
+import CouponFields from "./Components/CouponFields";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
         path: "/main/about",
         element: <About />,
       },
+      {
+        path: "/main/coupon/:operation/:couponID",
+        element: <CouponFields />,
+      }
     ],
   },
 ]);
