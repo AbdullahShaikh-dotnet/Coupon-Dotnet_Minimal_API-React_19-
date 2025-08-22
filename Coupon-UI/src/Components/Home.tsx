@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import UserContext from "../Utility/UserContext";
-import useCouponsData from "../Utility/useCouponsData";
+import { useCouponsData } from "../Utility/useCouponsData";
 import { columns } from "@/Components/Coupons-Datatable/CouponsColumns";
 import { CouponsDataTable } from "@/Components/Coupons-Datatable/CouponsDatatable";
 import { toast } from "sonner";
@@ -106,13 +106,13 @@ const Home = () => {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="start">
                                                     <DropdownMenuItem>
-                                                        <Link to={`/main/coupon?operation=edit&id=${d.id}`} className="flex gap-6">
+                                                        <Link to={`/main/coupon/edit/${d.id}`} className="flex gap-6">
                                                             <Pencil className="h-4 w-4 cursor-pointer" />
                                                             Edit
                                                         </Link>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem>
-                                                        <Link to={`/main/delete?id=${d.id}`} className="flex gap-6">
+                                                        <Link to={`/main/delete/${d.id}`} className="flex gap-6">
                                                             <Trash className="h-4 w-4 cursor-pointer text-red-600" />
                                                             Delete
                                                         </Link>
@@ -160,7 +160,6 @@ const Home = () => {
                         </div>
                     </CardContent>
                 </Card>
-
             </div>
         );
 };
