@@ -5,7 +5,7 @@ import { columns } from "@/Components/Coupons-Datatable/CouponsColumns";
 import { CouponsDataTable } from "@/Components/Coupons-Datatable/CouponsDatatable";
 import { toast } from "sonner";
 import useLoader from "@/Utility/useLoader";
-import { Progress } from "@/components/ui/progress";
+import { Progress } from "@/Components/ui/progress";
 import {
     Card,
     CardHeader,
@@ -13,11 +13,11 @@ import {
     CardContent,
     CardFooter,
     CardDescription
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from '@/components/ui/input';
+} from "@/Components/ui/card";
+import { Label } from "@/Components/ui/label";
+import { Input } from '@/Components/ui/input';
 import { Badge } from "@/Components/ui/badge"
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/ui/button';
 import { Ellipsis, Pencil, Trash, LayoutGrid, TableProperties } from 'lucide-react';
 import {
     DropdownMenu,

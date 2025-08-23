@@ -8,8 +8,9 @@ import Error from "./Components/Error";
 import Home from "./Components/Home";
 import About from "./Components/About";
 import AppLayout from "./Components/AppLayout";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/Components/ui/sonner";
 import CouponFields from "./Components/CouponFields";
+
 
 const router = createBrowserRouter([
   {
