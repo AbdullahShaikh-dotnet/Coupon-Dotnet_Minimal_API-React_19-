@@ -68,7 +68,8 @@ This repository demonstrates clean architecture, RESTful principles, authenticat
 1. **Clone the repository**
    ```bash
    git clone https://github.com/AbdullahShaikh-dotnet/Coupon_Minimal_API-Dotnet-Core.git
-   cd Coupon_Minimal_API-Dotnet-Core```
+   cd Coupon_Minimal_API-Dotnet-Core
+   ```
 
 2. **Apply migrations and create database**
    ```bash
@@ -92,7 +93,7 @@ npm run dev:aspire
 npm run dev:all
 ```
 
-###🧾 License
+### 🧾 License
 **This project is licensed under the MIT License – see the LICENSE file for details.**
 
 
