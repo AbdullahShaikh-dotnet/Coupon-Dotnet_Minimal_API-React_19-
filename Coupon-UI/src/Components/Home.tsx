@@ -26,6 +26,11 @@ import {
     DropdownMenuTrigger
 } from "@/Components/ui/dropdown-menu"
 import { Link } from 'react-router';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/Components/ui/tooltip"
 
 
 const Home = () => {
@@ -70,11 +75,20 @@ const Home = () => {
                                 </Label>
                             </div>
                             <div className="gap-2 flex">
-                                <Button variant="outline" title={!isCardViewVisible ? "Card View" : "Grid View"} onClick={() => { setCardViewVisible(!isCardViewVisible) }}>
-                                    {
-                                        !isCardViewVisible ? <LayoutGrid /> : <TableProperties />
-                                    }
-                                </Button>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button variant="outline" onClick={() => { setCardViewVisible(!isCardViewVisible) }}>
+                                            {
+                                                !isCardViewVisible ? <LayoutGrid /> : <TableProperties />
+                                            }
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        {
+                                            !isCardViewVisible ? "Card View" : "Grid View"
+                                        }
+                                    </TooltipContent>
+                                </Tooltip>
                             </div>
                         </div>
                     </CardHeader>
