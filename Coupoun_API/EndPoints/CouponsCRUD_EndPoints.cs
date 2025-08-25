@@ -26,7 +26,7 @@ namespace Coupon_API.EndPoints
                 .AddEndpointFilter(async (context, next) =>
                 {
                     int id = context.GetArgument<int>(4);
-                    if(id <= 0)
+                    if (id <= 0)
                         return Results.BadRequest("Id must be greater than 0");
 
                     return await next(context);
@@ -142,42 +142,53 @@ namespace Coupon_API.EndPoints
         [Authorize(Roles = "admin")]
         private static async Task<IResult> UpdateCoupon(ApplicationDbContext _db, IMapper mapper, IValidator<CouponUpdateDTO> _validator, [FromBody] CouponUpdateDTO couponUpdate)
         {
-            var validationResult = await _validator.ValidateAsync(couponUpdate);
-
-            APIResponse response = new APIResponse();
-
-            if (!validationResult.IsValid)
+            try
             {
-                response.ErrorMessages = validationResult.Errors.Select(error => error.ErrorMessage).ToList();
-                return Results.BadRequest(response);
-            }
+                var validationResult = await _validator.ValidateAsync(couponUpdate);
+                APIResponse response = new APIResponse();
 
-            if (await _db.Coupons.AnyAsync(c => c.Name == couponUpdate.Name && c.Id != couponUpdate.Id))
-            {
-                response.ErrorMessages = new List<string>
+                if (!validationResult.IsValid)
+                {
+                    response.ErrorMessages = validationResult.Errors.Select(error => error.ErrorMessage).ToList();
+                    return Results.BadRequest(response);
+                }
+
+                if (await _db.Coupons.AnyAsync(c => c.Name == couponUpdate.Name && c.Id != couponUpdate.Id))
+                {
+                    response.ErrorMessages = new List<string>
                     {
                         "Coupon Name already Exists"
                     };
-                response.StatusCode = HttpStatusCode.Conflict;
-                return Results.BadRequest(response);
+                    response.StatusCode = HttpStatusCode.Conflict;
+                    return Results.BadRequest(response);
+                }
+
+                var coupon = await _db.Coupons.FirstOrDefaultAsync(prop => prop.Id == couponUpdate.Id);
+                coupon.Name = couponUpdate.Name;
+                coupon.ExpireDate = couponUpdate.ExpireDate;
+                coupon.Percentage = couponUpdate.Percentage;
+                coupon.IsActive = couponUpdate.IsActive;
+                coupon.ModifyId = 1;
+                coupon.ModifyDate = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+
+                var resultCoupon = mapper.Map<CouponDTO>(coupon);
+
+                response.Result = resultCoupon;
+                response.StatusCode = HttpStatusCode.OK;
+                response.IsSuccess = true;
+
+                return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id }, response);
             }
-
-            var coupon = await _db.Coupons.FirstOrDefaultAsync(prop => prop.Id == couponUpdate.Id);
-            coupon.Name = couponUpdate.Name;
-            coupon.ExpireDate = couponUpdate.ExpireDate;
-            coupon.Percentage = couponUpdate.Percentage;
-            coupon.IsActive = couponUpdate.IsActive;
-            coupon.ModifyId = 1;
-            coupon.ModifyDate = DateTime.Now;
-
-            await _db.SaveChangesAsync();
-
-
-            var resultCoupon = mapper.Map<CouponDTO>(coupon);
-
-            response.Result = resultCoupon;
-
-            return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id }, response);
+            catch (Exception ex)
+            {
+                return Results.BadRequest(new APIResponse
+                {
+                    IsSuccess = false,
+                    ErrorMessages = new List<string> { ex.Message }
+                });
+            }
         }
 
 
@@ -211,7 +222,7 @@ namespace Coupon_API.EndPoints
         }
 
 
-        private static async Task<IResult> SearchCoupon([AsParameters] SearchCoupon search, 
+        private static async Task<IResult> SearchCoupon([AsParameters] SearchCoupon search,
             ApplicationDbContext _db, IMapper mapper, IValidator<SearchCoupon> _validator)
         {
             APIResponse response = new APIResponse();
