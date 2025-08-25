@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import UserContext from "../Utility/UserContext";
-import { useCouponsData } from "../Utility/useCouponsData";
+import { useCouponsData } from "../Utility/useCoupons";
 import { columns } from "@/Components/Coupons-Datatable/CouponsColumns";
 import { CouponsDataTable } from "@/Components/Coupons-Datatable/CouponsDatatable";
 import { toast } from "sonner";
