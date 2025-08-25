@@ -10,21 +10,23 @@ import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import useLoader from "../Utility/useLoader"
-import { useCouponsDataByID } from "../Utility/useCouponsData"
+import { useCouponsDataByID, useCouponPut } from "../Utility/useCoupons"
 import { Progress } from "@/Components/ui/progress"
 import { Card, CardHeader, CardTitle, CardContent } from "@/Components/ui/card"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { useParams, useNavigate } from "react-router";
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
 } from "@/Components/ui/tooltip";
+import UserContext from '../Utility/UserContext'
 
 const CouponFields = () => {
     const { couponID, operation } = useParams();
     const [FieldError, setFieldError] = useState({});
     const navigate = useNavigate();
+    const { user } = useContext(UserContext);
 
     const [defaultValues, setDefaultValues] = useState({
         id: couponID,
@@ -32,7 +34,7 @@ const CouponFields = () => {
         couponCode: "",
         isActive: false,
         percentage: 0,
-        expireDate: new Date(),
+        expireDate: "2025-09-01",
     })
 
 
@@ -49,12 +51,15 @@ const CouponFields = () => {
             newErrors.percentage = "Percentage must be between 1 and 100.";
         }
         if (new Date(values.expireDate) <= new Date()) {
-            newErrors.expiryDate = "Expiry date must be in the future.";
+            newErrors.expireDate = "Expiry date must be in the future.";
         }
 
         return newErrors;
     };
 
+    function formatDate(date) {
+        return date.toISOString().split('T')[0]; // gives yyyy-MM-dd
+    }
 
     const { data, error, isLoading } = useCouponsDataByID(couponID)
 
@@ -64,8 +69,10 @@ const CouponFields = () => {
     }
 
     const handleDateSelect = (date) => {
-        setDefaultValues((prev) => ({ ...prev, expireDate: date }))
+        setDefaultValues((prev) => ({ ...prev, expireDate: formatDate(date) }))
     }
+
+    const { updateCoupon } = useCouponPut();
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -75,28 +82,28 @@ const CouponFields = () => {
         if (Object.keys(validationErrors).length !== 0)
             return;
 
-        //const response = await fetch("api/coupon", {
-        //    method: "PUT",
-        //    body: JSON.stringify({
-        //        "id": 0,
-        //        "name": "string",
-        //        "percentage": 0,
-        //        "expireDate": "2025-08-24",
-        //        "isActive": true
-        //    }),
-        //});
-
+        try {
+            await updateCoupon(defaultValues, user.token);
+            toast.success("Coupon updated !");
+            navigate("/main/home");
+           
+        } catch (error) {
+            toast.error("Failed to update coupon", {
+                description: error.message
+            });
+        }
     }
 
 
     useEffect(() => {
         if (data) {
             setDefaultValues({
+                id: couponID,
                 name: data.name || "",
                 couponCode: data.couponCode || "",
                 isActive: data.isActive ?? false,
                 percentage: data.percentage ?? 0,
-                expiryDate: data.expiryDate ? new Date(data.expiryDate) : new Date(),
+                expireDate: data.expireDate,
             })
         }
 
@@ -108,7 +115,7 @@ const CouponFields = () => {
             })
         }
 
-    }, [data, error])
+    }, [data, error, couponID])
 
     const progress = useLoader(isLoading)
 
