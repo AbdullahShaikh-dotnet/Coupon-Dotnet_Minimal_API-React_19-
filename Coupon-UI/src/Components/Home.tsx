@@ -1,8 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import UserContext from "../Utility/UserContext";
-import { useCouponsData } from "../Utility/useCoupons";
-import { columns } from "@/Components/Coupons-Datatable/CouponsColumns";
-import { CouponsDataTable } from "@/Components/Coupons-Datatable/CouponsDatatable";
+import { useCouponsGet, useCouponDelete } from "../Utility/useCoupons";
 import { toast } from "sonner";
 import useLoader from "@/Utility/useLoader";
 import { Progress } from "@/Components/ui/progress";
@@ -30,14 +28,26 @@ import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
-} from "@/Components/ui/tooltip"
+} from "@/Components/ui/tooltip";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/Components/ui/alert-dialog";
 
 
 const Home = () => {
     const { user } = useContext(UserContext);
-    const { data, error, isLoading } = useCouponsData();
+    const { data, error, isLoading, refetch } = useCouponsGet();
     const progress = useLoader(isLoading);
-    const [isCardViewVisible, setCardViewVisible] = useState(true);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [selectedCouponId, setSelectedCouponId] = useState(null);
+    const { DeleteCoupon, loading, error: deleteError, data: deleteResponse } = useCouponDelete();
 
     const formatDate = (date: Date) => {
         const DATE = new Date(date);
@@ -55,6 +65,26 @@ const Home = () => {
         }
     }, [error]);
 
+
+    const handleDelete = async () => {
+        const promise = DeleteCoupon(Number(selectedCouponId), user.token.toString());
+
+        toast.promise(promise, {
+            loading: 'Deleting coupon...',
+            success: () => 'Coupon deleted successfully!',
+            error: (err) => err.message || 'Failed to delete coupon.',
+        });
+
+        try {
+            await promise;
+            await refetch();
+            setDeleteDialogOpen(false);
+            setSelectedCouponId(null);
+        } catch { }
+    };
+
+
+
     return isLoading ?
         (<div className="flex items-center justify-center w-screen h-screen bg-white">
             <div className="w-64">
@@ -65,36 +95,16 @@ const Home = () => {
             <div className="pt-30 px-4 max-w-7xl mx-auto">
                 <Card>
                     <CardHeader>
-                        <div className="flex justify-between">
-                            <div>
-                                <Label className="text-3xl font-bold mb-1">
-                                    Coupons
-                                </Label>
-                                <Label className="text-sm text-muted-foreground">
-                                    Here are your latest coupons and offers.
-                                </Label>
-                            </div>
-                            <div className="gap-2 flex">
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button variant="outline" onClick={() => { setCardViewVisible(!isCardViewVisible) }}>
-                                            {
-                                                !isCardViewVisible ? <LayoutGrid /> : <TableProperties />
-                                            }
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {
-                                            !isCardViewVisible ? "Card View" : "Grid View"
-                                        }
-                                    </TooltipContent>
-                                </Tooltip>
-                            </div>
-                        </div>
+                        <Label className="text-3xl font-bold mb-1">
+                            Coupons
+                        </Label>
+                        <Label className="text-sm text-muted-foreground">
+                            Here are your latest coupons and offers.
+                        </Label>
                     </CardHeader>
 
                     <CardContent>
-                        <div id="cardLayout" className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 ${!isCardViewVisible ? "hidden" : ""}`}>
+                        <div id="cardLayout" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             {data.map((d) => (
                                 <Card key={d.id} className="shadow-sm hover:shadow-md transition-all">
                                     <CardHeader className="pb-2">
@@ -118,18 +128,23 @@ const Home = () => {
                                                         <Ellipsis />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="start">
+                                                <DropdownMenuContent align="center">
                                                     <DropdownMenuItem>
                                                         <Link to={`/main/coupon/edit/${d.id}`} className="flex gap-6">
                                                             <Pencil className="h-4 w-4 cursor-pointer" />
                                                             Edit
                                                         </Link>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem>
-                                                        <Link to={`/main/delete/${d.id}`} className="flex gap-6">
-                                                            <Trash className="h-4 w-4 cursor-pointer text-red-600" />
-                                                            Delete
-                                                        </Link>
+
+                                                    <DropdownMenuItem variant="destructive"
+                                                        className="flex gap-6 cursor-pointer"
+                                                        onClick={() => {
+                                                            setSelectedCouponId(d.id);
+                                                            setDeleteDialogOpen(true);
+                                                        }}
+                                                    >
+                                                        <Trash className="h-4 w-4" />
+                                                        Delete
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -169,11 +184,36 @@ const Home = () => {
                                 </Card>
                             ))}
                         </div>
-                        <div className={`mt-6 ${isCardViewVisible ? "hidden" : ""}`} id="gridLayout">
-                            <CouponsDataTable data={data} columns={columns} />
-                        </div>
                     </CardContent>
                 </Card>
+
+
+                <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete your
+                                coupon and remove it from our servers.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
+                                Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction asChild>
+                                <Button
+                                    variant="destructive"
+                                    className="bg-red-600 text-white hover:bg-red-700"
+                                    onClick={handleDelete}
+                                >
+                                    Yes, Delete
+                                </Button>
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+
             </div>
         );
 };
