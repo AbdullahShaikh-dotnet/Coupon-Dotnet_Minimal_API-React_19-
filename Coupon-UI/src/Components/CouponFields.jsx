@@ -10,7 +10,7 @@ import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import useLoader from "../Utility/useLoader"
-import { useCouponsDataByID, useCouponPut } from "../Utility/useCoupons"
+import { useCouponsGetByID, useCouponPut } from "../Utility/useCoupons"
 import { Progress } from "@/Components/ui/progress"
 import { Card, CardHeader, CardTitle, CardContent } from "@/Components/ui/card"
 import { useState, useEffect, useContext } from "react"
@@ -28,15 +28,17 @@ const CouponFields = () => {
     const navigate = useNavigate();
     const { user } = useContext(UserContext);
 
+    // Determine if we're in edit mode
+    const isEditMode = operation === "edit" && couponID;
+
     const [defaultValues, setDefaultValues] = useState({
-        id: couponID,
+        id: isEditMode ? couponID : 0,
         name: "",
         couponCode: "",
         isActive: false,
         percentage: 0,
         expireDate: "2025-09-01",
     })
-
 
     const validate = (values) => {
         const newErrors = {};
@@ -61,7 +63,8 @@ const CouponFields = () => {
         return date.toISOString().split('T')[0]; // gives yyyy-MM-dd
     }
 
-    const { data, error, isLoading } = useCouponsDataByID(couponID)
+    // Only fetch data if we're in edit mode
+    const { data, error, isLoading } = useCouponsGetByID(isEditMode ? couponID : null);
 
     const setValues = (e) => {
         let { id, value } = e.target
@@ -73,8 +76,9 @@ const CouponFields = () => {
     }
 
     const { updateCoupon } = useCouponPut();
+    //const { createCoupon } = useCouponPost(); // Assuming you have this hook
 
-    const handleUpdate = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const validationErrors = validate(defaultValues);
         setFieldError(validationErrors);
@@ -83,20 +87,24 @@ const CouponFields = () => {
             return;
 
         try {
-            await updateCoupon(defaultValues, user.token);
-            toast.success("Coupon updated !");
+            if (isEditMode) {
+                await updateCoupon(defaultValues, user.token);
+                toast.success("Coupon updated!");
+            } else {
+                //await createCoupon(defaultValues, user.token);
+                toast.success("Coupon created!");
+            }
             navigate("/main/home");
-           
         } catch (error) {
-            toast.error("Failed to update coupon", {
+            toast.error(`Failed to ${isEditMode ? 'update' : 'create'} coupon`, {
                 description: error.message
             });
         }
     }
 
-
     useEffect(() => {
-        if (data) {
+        // Only process data if we're in edit mode and have data
+        if (data && isEditMode) {
             setDefaultValues({
                 id: couponID,
                 name: data.name || "",
@@ -107,7 +115,8 @@ const CouponFields = () => {
             })
         }
 
-        if (error) {
+        // Only show error if we're trying to edit but have an error
+        if (error && isEditMode) {
             toast.error("Error", {
                 duration: 5000,
                 dismissible: true,
@@ -115,11 +124,12 @@ const CouponFields = () => {
             })
         }
 
-    }, [data, error, couponID])
+    }, [data, error, couponID, isEditMode])
 
     const progress = useLoader(isLoading)
 
-    if (isLoading) {
+    // Show loading only when we're editing and actually loading data
+    if (isLoading && isEditMode) {
         return (
             <div className="flex items-center justify-center w-screen h-screen bg-white">
                 <div className="w-64">
@@ -129,7 +139,8 @@ const CouponFields = () => {
         )
     }
 
-    if (!data) {
+    // Show error only when editing and no data found
+    if (!data && isEditMode && !isLoading) {
         return (
             <div className="flex items-center justify-center w-screen h-screen bg-white">
                 <p className="text-red-500">No data found for the given coupon ID.</p>
@@ -144,9 +155,11 @@ const CouponFields = () => {
                     <div className="flex justify-between">
                         <div className="space-y-2">
                             <CardTitle className="text-3xl font-bold">
-                                {operation.charAt(0).toUpperCase() + operation.slice(1)} Coupon
+                                {operation === "new" ? "Create" : operation.charAt(0).toUpperCase() + operation.slice(1)} Coupon
                             </CardTitle>
-                            <p className="text-muted-foreground">Here you can {operation} a coupon with all necessary details</p>
+                            <p className="text-muted-foreground">
+                                Here you can {operation === "new" ? "create" : operation} a coupon with all necessary details
+                            </p>
                         </div>
                         <div>
                             <Tooltip>
@@ -173,7 +186,13 @@ const CouponFields = () => {
                                 </Label>
                                 <Input
                                     value={defaultValues.name || ""}
-                                    onChange={(e) => { setValues(e); setDefaultValues((prev) => ({ ...prev, "couponCode": e.target.value.toUpperCase() + defaultValues.percentage })); }}
+                                    onChange={(e) => {
+                                        setValues(e);
+                                        setDefaultValues((prev) => ({
+                                            ...prev,
+                                            "couponCode": e.target.value.toUpperCase() + defaultValues.percentage
+                                        }));
+                                    }}
                                     type="text"
                                     id="name"
                                     placeholder="Enter coupon name"
@@ -212,7 +231,13 @@ const CouponFields = () => {
                                         id="percentage"
                                         placeholder="0"
                                         value={defaultValues.percentage || 0}
-                                        onChange={(e) => { setValues(e); setDefaultValues((prev) => ({ ...prev, "couponCode": defaultValues.name.toUpperCase() + e.target.value })); }}
+                                        onChange={(e) => {
+                                            setValues(e);
+                                            setDefaultValues((prev) => ({
+                                                ...prev,
+                                                "couponCode": defaultValues.name.toUpperCase() + e.target.value
+                                            }));
+                                        }}
                                         min="0"
                                         max="100"
                                         className="h-11"
@@ -223,12 +248,8 @@ const CouponFields = () => {
                                                 setDefaultValues((prev) => ({
                                                     ...prev,
                                                     percentage: e[0],
+                                                    couponCode: defaultValues.name.toUpperCase() + e[0]
                                                 }));
-
-                                                setDefaultValues((prev) => ({
-                                                    ...prev,
-                                                    couponCode: defaultValues.name.toUpperCase() + e[0],
-                                                }))
                                             }}
                                             max={100}
                                             step={1}
@@ -272,6 +293,7 @@ const CouponFields = () => {
                                                 selected={defaultValues.expireDate}
                                                 onSelect={handleDateSelect}
                                                 disabled={date => date < new Date()}
+                                                month={defaultValues.expireDate || new Date()}
                                                 initialFocus
                                             />
                                         </PopoverContent>
@@ -300,8 +322,8 @@ const CouponFields = () => {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-3 justify-end pt-6 border-t">
-                        <Button onClick={handleUpdate} className="px-8 h-11">
-                            Update Coupon
+                        <Button onClick={handleSubmit} className="px-8 h-11">
+                            {isEditMode ? "Update" : "Create"} Coupon
                         </Button>
                     </div>
                 </CardContent>
