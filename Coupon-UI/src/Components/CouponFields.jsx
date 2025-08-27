@@ -5,7 +5,7 @@ import { Switch } from "@/Components/ui/switch"
 import { Slider } from "@/Components/ui/slider"
 import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover"
 import { Calendar } from "@/Components/ui/calendar"
-import { CalendarIcon, ArrowBigLeft } from "lucide-react"
+import { CalendarIcon, ArrowLeft } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
@@ -14,12 +14,8 @@ import { useCouponsGetByID, useCouponPut } from "../Utility/useCoupons"
 import { Progress } from "@/Components/ui/progress"
 import { Card, CardHeader, CardTitle, CardContent } from "@/Components/ui/card"
 import { useState, useEffect, useContext } from "react"
-import { useParams, useNavigate } from "react-router";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "@/Components/ui/tooltip";
+import { useParams, useNavigate, Link } from "react-router";
+
 import UserContext from '../Utility/UserContext'
 
 const CouponFields = () => {
@@ -162,16 +158,10 @@ const CouponFields = () => {
                             </p>
                         </div>
                         <div>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button variant="secondary" onClick={() => navigate("/main/home")}>
-                                        <ArrowBigLeft />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    Back to Home
-                                </TooltipContent>
-                            </Tooltip>
+                            <Button variant="outline" onClick={() => navigate("/main/home")}>
+                                <ArrowLeft className="mr-2 h-4 w-4" />
+                                Back
+                            </Button>
                         </div>
                     </div>
                 </CardHeader>
