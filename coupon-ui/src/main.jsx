@@ -10,44 +10,49 @@ import About from "./Components/About";
 import AppLayout from "./Components/AppLayout";
 import { Toaster } from "@/Components/ui/sonner";
 import CouponFields from "./Components/CouponFields";
+import { ContactUs } from '@/Components/Contact-us'
 
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Login />,
-    errorElement: <Error />,
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/Register",
-    element: <Register />,
-  },
-  {
-    path: "/main",
-    element: <AppLayout />,
-    children: [
-      {
-        path: "/main/register",
+    {
+        path: "/",
+        element: <Login />,
+        errorElement: <Error />,
+    },
+    {
+        path: "/login",
+        element: <Login />,
+    },
+    {
+        path: "/Register",
         element: <Register />,
-      },
-      {
-        path: "/main/home",
-        element: <Home />,
-      },
-      {
-        path: "/main/about",
-        element: <About />,
-      },
-      {
-        path: "/main/coupon/:operation/:couponID",
-        element: <CouponFields />,
-      }
-    ],
-  },
+    },
+    {
+        path: "/main",
+        element: <AppLayout />,
+        children: [
+            {
+                path: "/main/register",
+                element: <Register />,
+            },
+            {
+                path: "/main/home",
+                element: <Home />,
+            },
+            {
+                path: "/main/contact",
+                element: <ContactUs />,
+            },
+            {
+                path: "/main/about",
+                element: <About />,
+            },
+            {
+                path: "/main/coupon/:operation/:couponID",
+                element: <CouponFields />,
+            }
+        ],
+    },
 ]);
 
 const root = createRoot(document.getElementById("root"));
