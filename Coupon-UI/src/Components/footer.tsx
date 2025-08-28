@@ -5,7 +5,7 @@ export function Footer() {
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
                     {/* Company Info */}
                     <div className="space-y-3">
-                        <h3 className="text-lg font-semibold">CouponHub</h3>
+                        <h3 className="text-lg font-semibold">Kup-ons</h3>
                         <p className="text-sm text-muted-foreground">
                             Your trusted platform for managing and discovering the best deals and coupons.
                         </p>
@@ -94,7 +94,7 @@ export function Footer() {
                 </div>
 
                 <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-                    <p className="text-sm text-muted-foreground">© 2024 CouponHub. All rights reserved.</p>
+                    <p className="text-sm text-muted-foreground">© 2024 Kup-ons. All rights reserved.</p>
                     <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                         <a href="#" className="hover:text-foreground transition-colors">
                             Status
