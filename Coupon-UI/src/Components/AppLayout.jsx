@@ -4,6 +4,7 @@ import UserContext from "../Utility/UserContext";
 import { Outlet, useNavigate } from "react-router";
 import { Progress } from "@/Components/ui/progress"; // shadcn progress import
 import { OfflineFallback } from "@/Components/offline-fallback"
+import { Footer } from '@/Components/footer';
 
 
 const AppLayout = () => {
@@ -44,6 +45,7 @@ const AppLayout = () => {
             <OfflineFallback>
                 <Outlet />
             </OfflineFallback>
+            <Footer />
         </UserContext.Provider>
     );
 };
