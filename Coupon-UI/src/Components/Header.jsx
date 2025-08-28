@@ -43,7 +43,7 @@ const navLinks = [
     path: "/services",
     icon: <Briefcase className="w-5 h-5" />,
   },
-  { name: "Contact", path: "/contact", icon: <Phone className="w-5 h-5" /> },
+  { name: "Contact", path: "/main/contact", icon: <Phone className="w-5 h-5" /> },
 ];
 
 const Header = () => {
