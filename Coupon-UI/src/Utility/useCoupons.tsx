@@ -143,3 +143,33 @@ export function useCouponDelete() {
     return { DeleteCoupon, loading, error, data };
 }
 
+
+
+export function useCouponPost() {
+    const createCoupon = async (coupon: AddCoupon, token: string) => {
+        try {
+            const res = await fetch('/api/coupon', {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(coupon)
+            })
+
+            const response = await res.json();
+
+            if (!response.isSuccess) {
+                throw new Error(response.errorMessages.join(", "));
+            }
+
+            return response;
+        } catch (error) {
+            console.log(error)
+            throw error;
+        }
+    };
+
+    return { createCoupon };
+}
