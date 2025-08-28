@@ -42,7 +42,7 @@ import {
 } from "@/Components/ui/alert-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
 
-const ITEMS_PER_PAGE = 12
+const ITEMS_PER_PAGE = 8
 
 const Home = () => {
     const { user } = useContext(UserContext)
