@@ -1,9 +1,13 @@
 using Coupon_API;
 using Coupon_API.Data;
 using Coupon_API.EndPoints;
+using Coupon_API.Models.DTO;
 using Coupon_API.Repository;
 using Coupon_API.Repository.IRepository;
+using Coupon_API.Services;
+using Coupon_API.Services.Interfaces;
 using Coupon_API.Utilities;
+using Coupon_API.Validation;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -146,6 +150,11 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
+
+
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IValidator<RefreshTokenDto>, RefreshTokenDtoValidator>();
 
 
 
