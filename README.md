@@ -12,7 +12,7 @@
 
 **A modern, full-stack coupon management solution built with cutting-edge technologies**
 
-[Live Demo](https://your-demo-link.com) • [Documentation](https://docs.example.com) • [Report Bug](https://github.com/AbdullahShaikh-dotnet/Coupon_Minimal_API-Dotnet-Core/issues) • [Request Feature](https://github.com/AbdullahShaikh-dotnet/Coupon_Minimal_API-Dotnet-Core/issues)
+[Report Bug](https://github.com/AbdullahShaikh-dotnet/Coupon_Minimal_API-Dotnet-Core/issues) • [Request Feature](https://github.com/AbdullahShaikh-dotnet/Coupon_Minimal_API-Dotnet-Core/issues)
 
 </div>
 
