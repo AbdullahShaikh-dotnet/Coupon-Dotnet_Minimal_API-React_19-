@@ -1,4 +1,5 @@
 ﻿using Coupon_API.Models.DTO;
+using Coupon_API.Utilities;
 
 namespace Coupon_API.Repository.IRepository
 {
@@ -9,5 +10,9 @@ namespace Coupon_API.Repository.IRepository
         Task<UserDTO> Register(UserRegisterDTO RegisterObject);
 
         Task<UserLoginResponseDTO> Login(UserLoginDTO LoginObject);
+
+        Task<ApiResponse<AuthResponseDto>> LoginAsync(UserLoginDTO loginDto);
+
+        Task<ApiResponse<string>> LogoutAsync(string refreshToken);
     }
 }
