@@ -52,7 +52,8 @@ builder.Services.AddSwaggerGen(option =>
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
     });
     option.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
@@ -69,6 +70,24 @@ builder.Services.AddSwaggerGen(option =>
                 In = ParameterLocation.Header,
             },
             new List<string>()
+        }
+    });
+
+    option.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Coupon Management API",
+        Version = "v1",
+        Description = "A comprehensive REST API for managing discount coupons and promotions",
+        Contact = new OpenApiContact
+        {
+            Name = "Abdullah Shaikh",
+            Email = "shaikhabdullah299@gmail.com.com",
+            Url = new Uri("https://github.com/AbdullahShaikh-dotnet")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "MIT License",
+            Url = new Uri("https://opensource.org/licenses/MIT")
         }
     });
 });
@@ -139,7 +158,13 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Coupon Management API v1");
+        c.RoutePrefix = "swagger";
+        c.DocumentTitle = "Coupon Management API Documentation";
+        c.DefaultModelsExpandDepth(-1);
+    });
 }
 
 // To Use from React (CORS Setup)
