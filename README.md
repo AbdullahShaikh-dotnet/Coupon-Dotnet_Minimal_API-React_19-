@@ -15,7 +15,13 @@ This repository demonstrates clean architecture, RESTful principles, authenticat
 
 - **Backend** → Clean, modular **Minimal API** built on **.NET 9**, using EF Core + SQL Server  
 - **Frontend** → **React 19** with **Shadcn UI**  
-- **Full-stack template** → Ideal for learning, prototyping, or extending into production apps  
+- **Full-stack template** → Ideal for learning, prototyping, or extending into production apps
+
+---
+
+
+## 🧾 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -106,8 +112,20 @@ npm run dev:aspire
 npm run dev:all
 ```
 
-## 🧾 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/AbdullahShaikh-dotnet" target="_blank">Abdullah Shaikh</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/AbdullahShaikh-dotnet/.Net-Core-Project-E-Commerce/stargazers" target="_blank">
+    ⭐ Star this project
+  </a>
+  ·
+  <a href="https://github.com/AbdullahShaikh-dotnet/.Net-Core-Project-E-Commerce/issues" target="_blank">
+    🐛 Report Issues
+  </a>
+</p> 
 
    
