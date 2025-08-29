@@ -62,7 +62,7 @@ This repository demonstrates clean architecture, RESTful principles, authenticat
 |----------------------|------------------------------------------------|
 | Login                | ![Home](/Coupon-UI/Screenshots/Login.png)      |
 | Home                 | ![Home](/Coupon-UI/Screenshots/Home.png) <br> ![Home2](/Coupon-UI/Screenshots/Home2.png) <br> ![Home3](/Coupon-UI/Screenshots/Home3.png) |
-| Create and Edit      | ![C&R](/Coupon-UI/Screenshots/Create_and_Edit.png) |
+| Create and Edit      | ![C&R](/Coupon-UI/Screenshots/CreateandEdit.png) |
 | ContactUs            | ![ContactUs](/Coupon-UI/Screenshots/ContactUs.png) |
 
 
