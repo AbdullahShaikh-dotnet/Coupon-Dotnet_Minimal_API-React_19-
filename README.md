@@ -54,6 +54,17 @@ This repository demonstrates clean architecture, RESTful principles, authenticat
 
 ---
 
+
+
+## 📸 Screenshots
+
+| Page                 | Preview                                        |
+|----------------------|------------------------------------------------|
+| Home Page            | ![Home](/Coupon-UI/Screenshots/Home.png)                |
+
+
+
+
 ## 🛠️ Getting Started
 
 ### Prerequisites
