@@ -132,11 +132,8 @@ builder.Services.AddAuthentication(option =>
     };
 });
 
-builder.Services.AddAuthorization(option =>
-    option.AddPolicy("adminOnly",
-        policy => policy.RequireRole("admin")
-    )
-);
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("adminOnly", policy => policy.RequireRole("admin"));
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(
