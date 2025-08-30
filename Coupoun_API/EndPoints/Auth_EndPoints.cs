@@ -27,6 +27,13 @@ namespace Coupon_API.EndPoints
             .Produces(400)
             .Accepts<UserRegisterDTO>(contentType: "application/json");
 
+            app.MapPost("/api/logout", Logout)
+            .WithName("Logout")
+            .Produces<ApiResponse<bool>>()
+            .Produces(400)
+            .WithOpenApi()
+            .AllowAnonymous();
+
 
             app.MapPost("/api/auth/refresh", RefreshToken)
             .WithName("RefreshToken")
@@ -83,7 +90,11 @@ namespace Coupon_API.EndPoints
             return loginResponse.Success ? Results.Ok(loginResponse) : Results.BadRequest(loginResponse);
         }
 
-
+        private static async Task<IResult> Logout(IAuthRepository authRepository, string refreshToken)
+        {
+            var response = await authRepository.LogoutAsync(refreshToken);
+            return response.Success ? Results.Ok(response) : Results.BadRequest(response);
+        }
 
         private static async Task<IResult> RefreshToken(RefreshTokenDto refreshTokenDto, IAuthService authService, IValidator<RefreshTokenDto> validator)
         {
