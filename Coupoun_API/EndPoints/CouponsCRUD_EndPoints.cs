@@ -2,10 +2,12 @@
 using Coupon_API.Data;
 using Coupon_API.Models;
 using Coupon_API.Models.DTO;
+using Coupon_API.Utilities;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
 
@@ -17,12 +19,13 @@ namespace Coupon_API.EndPoints
         {
             // Get All Coupon
             app.MapGet("/api/coupon", GetAllCoupons)
-                .WithName("GetCoupons").Produces<APIResponse>(200);
+                .WithName("GetCoupons")
+                .Produces<ApiResponse<CouponDTO>>(200);
 
 
             // Get Coupon By ID
             app.MapGet("/api/coupon/{id:int}", GetAllCouponByID)
-                .WithName("GetCoupon").Produces<APIResponse>(200)
+                .WithName("GetCoupon").Produces<ApiResponse<List<CouponDTO>>>(200)
                 .AddEndpointFilter(async (context, next) =>
                 {
                     int id = context.GetArgument<int>(4);
@@ -36,28 +39,29 @@ namespace Coupon_API.EndPoints
             // Add Coupon
             app.MapPost("/api/coupon", AddCoupon).WithName("CreateCoupons")
             .RequireAuthorization("adminOnly")
-            .Produces<APIResponse>(201)
+            .Produces<ApiResponse<CouponCreateDTO>>(201)
             .Produces(400)
             .Accepts<CouponCreateDTO>(contentType: "application/json");
 
 
             // Update Coupon
-            app.MapPut("/api/coupon", UpdateCoupon).Produces<APIResponse>(200)
-            .Produces(400)
-            .Accepts<CouponUpdateDTO>(contentType: "application/json")
-            .WithName("UpdateCoupons");
+            app.MapPut("/api/coupon", UpdateCoupon)
+                .Produces<ApiResponse<CouponDTO>>(200)
+                .Produces(400)
+                .Accepts<CouponUpdateDTO>(contentType: "application/json")
+                .WithName("UpdateCoupons").RequireAuthorization("adminOnly");
 
 
             // Delete Coupon
             app.MapDelete("/api/coupon{id:int}", DeleteCoupon)
             .WithName("DeleteCoupon")
-            .Produces<APIResponse>(200)
+            .Produces<ApiResponse<CouponDTO>>(200)
             .Produces(400);
 
 
             app.MapGet("/api/coupon/search", SearchCoupon)
             .WithName("SearchCoupon")
-            .Produces<APIResponse>(200)
+            .Produces<ApiResponse<IEnumerable<CouponDTO>>>(200)
             .Produces(400);
         }
 
@@ -68,14 +72,7 @@ namespace Coupon_API.EndPoints
                 .Where(coupon => coupon.DeleteId == null).ToListAsync();
 
             var coupons = mapper.Map<IEnumerable<CouponDTO>>(couponDB);
-
-            APIResponse response = new APIResponse
-            {
-                Result = coupons,
-                IsSuccess = true,
-                StatusCode = HttpStatusCode.OK
-            };
-
+            var response = ApiResponse<IEnumerable<CouponDTO>>.Ok(data: coupons);
             _logger.LogInformation("Getting Coupons");
             return Results.Ok(response);
         }
@@ -83,25 +80,21 @@ namespace Coupon_API.EndPoints
 
         private static async Task<IResult> GetAllCouponByID(ApplicationDbContext _db, IValidator<int> validator, IMapper mapper, ILogger<Program> _logger, int id)
         {
-            APIResponse response = new APIResponse();
             var validationResult = await validator.ValidateAsync(id);
 
             if (!validationResult.IsValid)
             {
-                response.ErrorMessages = validationResult.Errors.Select(error => error.ErrorMessage).ToList();
-                return Results.BadRequest(response);
+                var badRequest = ApiResponse<List<CouponDTO>>.Fail(errors: validationResult.Errors.Select(error => error.ErrorMessage).ToList(), message: "Validation Error");
+                _logger.Log(LogLevel.Error, "Validation Error : Invalid ID");
+                return Results.BadRequest(badRequest);
             }
 
             var couponDB = await _db.Coupons
                 .FirstOrDefaultAsync(coupon => coupon.Id == id && coupon.DeleteId == null);
 
             var coupon = mapper.Map<CouponDTO>(couponDB);
+            var response = ApiResponse<List<CouponDTO>>.Ok(data: new List<CouponDTO> { coupon });
 
-            response.Result = new List<CouponDTO> { coupon };
-            response.IsSuccess = true;
-            response.StatusCode = HttpStatusCode.OK;
-
-            _logger.Log(LogLevel.Warning, "Just for Fun");
             return Results.Ok(response);
         }
 
@@ -110,22 +103,20 @@ namespace Coupon_API.EndPoints
         {
             var validationResult = await _validator.ValidateAsync(_CouponCreateDTO);
 
-            APIResponse response = new APIResponse();
-
             if (!validationResult.IsValid)
             {
-                response.ErrorMessages = validationResult.Errors.Select(error => error.ErrorMessage).ToList();
-                return Results.BadRequest(response);
+                var badRequest = ApiResponse<CouponCreateDTO>.Fail(errors: validationResult.Errors.Select(error => error.ErrorMessage).ToList(), message: "Validation Error");
+                return Results.BadRequest(badRequest);
             }
 
-            if (await _db.Coupons.AnyAsync(c => c.Name == _CouponCreateDTO.Name))
+            if (await _db.Coupons.AnyAsync(c => c.Name.ToLower() == _CouponCreateDTO.Name.ToLower()))
             {
-                response.ErrorMessages = new List<string>
+                var alreadyExists = ApiResponse<CouponCreateDTO>
+                    .Fail(errors: new List<string>()
                     {
-                        "Coupon Name already Exists"
-                    };
-                response.StatusCode = HttpStatusCode.Conflict;
-                return Results.BadRequest(response);
+                        "Coupon name already exists"
+                    }, message: "Validation Error");
+                return Results.BadRequest(alreadyExists);
             }
 
             Coupon coupon = _mapper.Map<Coupon>(_CouponCreateDTO);
@@ -133,8 +124,7 @@ namespace Coupon_API.EndPoints
             _db.Coupons.Add(coupon);
             await _db.SaveChangesAsync();
 
-            response.IsSuccess = true;
-            response.Result = _mapper.Map<CouponDTO>(coupon);
+            var response = ApiResponse<CouponDTO>.Ok(data: _mapper.Map<CouponDTO>(coupon));
 
             return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id }, response);
         }
@@ -142,69 +132,50 @@ namespace Coupon_API.EndPoints
         [Authorize(Roles = "admin")]
         private static async Task<IResult> UpdateCoupon(ApplicationDbContext _db, IMapper mapper, IValidator<CouponUpdateDTO> _validator, [FromBody] CouponUpdateDTO couponUpdate)
         {
-            try
+            var validationResult = await _validator.ValidateAsync(couponUpdate);
+
+            if (!validationResult.IsValid)
             {
-                var validationResult = await _validator.ValidateAsync(couponUpdate);
-                APIResponse response = new APIResponse();
-
-                if (!validationResult.IsValid)
-                {
-                    response.ErrorMessages = validationResult.Errors.Select(error => error.ErrorMessage).ToList();
-                    return Results.BadRequest(response);
-                }
-
-                if (await _db.Coupons.AnyAsync(c => c.Name == couponUpdate.Name && c.Id != couponUpdate.Id))
-                {
-                    response.ErrorMessages = new List<string>
-                    {
-                        "Coupon Name already Exists"
-                    };
-                    response.StatusCode = HttpStatusCode.Conflict;
-                    return Results.BadRequest(response);
-                }
-
-                var coupon = await _db.Coupons.FirstOrDefaultAsync(prop => prop.Id == couponUpdate.Id);
-                coupon.Name = couponUpdate.Name;
-                coupon.ExpireDate = couponUpdate.ExpireDate;
-                coupon.Percentage = couponUpdate.Percentage;
-                coupon.IsActive = couponUpdate.IsActive;
-                coupon.ModifyId = 1;
-                coupon.ModifyDate = DateTime.Now;
-
-                await _db.SaveChangesAsync();
-
-                var resultCoupon = mapper.Map<CouponDTO>(coupon);
-
-                response.Result = resultCoupon;
-                response.StatusCode = HttpStatusCode.OK;
-                response.IsSuccess = true;
-
-                return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id }, response);
+                var badRequest = ApiResponse<CouponCreateDTO>.Fail(errors: validationResult.Errors.Select(error => error.ErrorMessage).ToList(), message: "Validation Error");
+                return Results.BadRequest(badRequest);
             }
-            catch (Exception ex)
+
+            if (await _db.Coupons.AnyAsync(c => c.Name == couponUpdate.Name && c.Id != couponUpdate.Id))
             {
-                return Results.BadRequest(new APIResponse
-                {
-                    IsSuccess = false,
-                    ErrorMessages = new List<string> { ex.Message }
-                });
+                var alreadyExists = ApiResponse<CouponCreateDTO>
+               .Fail(errors: new List<string>()
+               {
+                        "Coupon name already exists"
+               }, message: "Validation Error");
+                return Results.BadRequest(alreadyExists);
             }
+
+            var coupon = await _db.Coupons.FirstOrDefaultAsync(prop => prop.Id == couponUpdate.Id);
+            coupon.Name = couponUpdate.Name;
+            coupon.ExpireDate = couponUpdate.ExpireDate;
+            coupon.Percentage = couponUpdate.Percentage;
+            coupon.IsActive = couponUpdate.IsActive;
+            coupon.ModifyId = 1;
+            coupon.ModifyDate = DateTime.Now;
+
+            await _db.SaveChangesAsync();
+
+            var response = ApiResponse<CouponDTO>.Ok(data: mapper.Map<CouponDTO>(coupon));
+
+            return Results.CreatedAtRoute("GetCoupon", new { id = coupon.Id }, response);
         }
 
 
         [Authorize(Roles = "admin")]
         private static async Task<IResult> DeleteCoupon(ApplicationDbContext _db, IMapper mapper, IValidator<int> validator, int id)
         {
-            APIResponse response = new APIResponse();
-
             var validationResult = await validator.ValidateAsync(id);
 
             if (!validationResult.IsValid)
             {
-                response.ErrorMessages = validationResult.Errors.Select(error => error.ErrorMessage).ToList();
-                return Results.BadRequest(response);
+                var badRequest = ApiResponse<CouponDTO>.Fail(errors: validationResult.Errors.Select(error => error.ErrorMessage).ToList(), message:"Validation Error");
+                return Results.BadRequest(badRequest);
             }
-
 
             var coupon = await _db.Coupons.FirstOrDefaultAsync(prop => prop.Id == id);
             coupon.DeleteId = 1;
@@ -213,10 +184,7 @@ namespace Coupon_API.EndPoints
             await _db.SaveChangesAsync();
 
             var coupons = _db.Coupons.Where(prop => prop.DeleteId == null);
-
-            response.Result = mapper.Map<IEnumerable<CouponDTO>>(coupons);
-            response.IsSuccess = true;
-            response.StatusCode = HttpStatusCode.OK;
+            var response = ApiResponse<CouponDTO>.Ok(data: mapper.Map<CouponDTO>(coupons));
 
             return Results.CreatedAtRoute("GetCoupon", new { id }, response);
         }
@@ -225,15 +193,13 @@ namespace Coupon_API.EndPoints
         private static async Task<IResult> SearchCoupon([AsParameters] SearchCoupon search,
             ApplicationDbContext _db, IMapper mapper, IValidator<SearchCoupon> _validator)
         {
-            APIResponse response = new APIResponse();
-            var validorSearchCoupon = await _validator.ValidateAsync(search);
+            var validationResult = await _validator.ValidateAsync(search);
 
-            if (!validorSearchCoupon.IsValid)
+            if (!validationResult.IsValid)
             {
-                response.ErrorMessages = validorSearchCoupon.Errors.Select(error => error.ErrorMessage).ToList();
-                return Results.BadRequest(response);
+                var badRequest = ApiResponse<CouponDTO>.Fail(errors: validationResult.Errors.Select(error => error.ErrorMessage).ToList(), message: "Validation Error");
+                return Results.BadRequest(badRequest);
             }
-
 
             var coupons = await _db.Coupons
                 .Where(c => c.Name.Contains(search.CouponName) && c.DeleteId == null)
@@ -241,9 +207,7 @@ namespace Coupon_API.EndPoints
                 .Take(search.PageSize)
                 .ToListAsync();
 
-            response.Result = mapper.Map<IEnumerable<CouponDTO>>(coupons);
-            response.StatusCode = HttpStatusCode.OK;
-            response.IsSuccess = true;
+            var response = ApiResponse<IEnumerable<CouponDTO>>.Ok(data: mapper.Map<IEnumerable<CouponDTO>>(coupons));
 
             return Results.Ok(response);
         }
