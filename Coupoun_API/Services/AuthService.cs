@@ -107,16 +107,7 @@ namespace Coupon_API.Services
                     Token = newJwtToken,
                     RefreshToken = newRefreshToken,
                     ExpiresAt = DateTime.UtcNow.AddHours(24), // JWT expires in 24 hours
-                    User = new UserLoginResponseDTO
-                    {
-                        User = new UserDTO
-                        {
-                            Id = user.Id,
-                            Name = user.Name,
-                            UserName = user.UserName,
-                        },
-                        Token = newJwtToken,
-                    }
+                    User = user
                 };
 
                 _logger.LogInformation("Token refreshed Sucess  for user {UserId}", userId);
