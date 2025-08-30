@@ -130,6 +130,25 @@ builder.Services.AddAuthentication(option =>
         ValidateIssuer = false,
         ValidateAudience = false,
     };
+
+    option.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+    {
+        OnChallenge = context =>
+        {
+            context.HandleResponse();
+            context.Response.StatusCode = 401;
+            context.Response.ContentType = "application/json";
+            var response = ApiResponse<string>.Fail(message: "Unauthorized - token missing or invalid.");
+            return context.Response.WriteAsJsonAsync(response);
+        },
+        OnForbidden = context =>
+        {
+            context.Response.StatusCode = 403;
+            context.Response.ContentType = "application/json";
+            var response = ApiResponse<string>.Fail(message: "Forbidden - not enough rights.");
+            return context.Response.WriteAsJsonAsync(response);
+        }
+    };
 });
 
 builder.Services.AddAuthorizationBuilder()
