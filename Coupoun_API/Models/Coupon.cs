@@ -8,7 +8,7 @@ namespace Coupon_API.Models
 
         public string Name { get; set; }
 
-        public string CouponCode => Name.ToUpper().Trim() + Percentage.ToString();
+        public string CouponCode => Name.ToUpper().Replace(" ", "") + Percentage.ToString();
 
         public int Percentage { get; set; }
 
