@@ -16,10 +16,25 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using System.Text;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+// Add Serilog
+builder.Host.UseSerilog((context, config) =>
+{
+    config.WriteTo.Console(Serilog.Events.LogEventLevel.Information);
+    config.WriteTo.Console(Serilog.Events.LogEventLevel.Error);
+    config.WriteTo.Console(Serilog.Events.LogEventLevel.Warning);
+    config.WriteTo.Console(Serilog.Events.LogEventLevel.Fatal);
+    config.WriteTo.Console(Serilog.Events.LogEventLevel.Debug);
+    config.WriteTo.Console(Serilog.Events.LogEventLevel.Verbose);
+    config.ReadFrom.Configuration(context.Configuration);
+});
+
 
 ///<summary>
 /// Below chain builds config from multiple sources in this order:
