@@ -22,7 +22,7 @@ namespace Coupon_API.Services
             _secretKey = _configuration.GetValue<string>("Auth:secret") ?? throw new ArgumentException("JWT Secret not configured");
             _issuer = _configuration["JwtSettings:Issuer"] ?? "CouponAPI";
             _audience = _configuration["JwtSettings:Audience"] ?? "CouponApp";
-            _expirationHours = int.Parse(_configuration["JwtSettings:ExpirationInHours"] ?? "24");
+            _expirationHours = int.Parse(_configuration["JwtSettings:ExpirationInHours"] ?? "1");
         }
 
         public string GenerateJwtToken(User user)
