@@ -4,6 +4,7 @@ using Coupon_API.Models;
 using Coupon_API.Models.DTO;
 using Coupon_API.Repository.IRepository;
 using Coupon_API.Services.Interfaces;
+using Coupon_API.Utilities;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,13 +18,13 @@ namespace Coupon_API.EndPoints
         public static void MapAuthEndpoints(this IEndpointRouteBuilder app)
         {
             app.MapPost("/api/login", SecureLogin).WithName("Login")
-            .Produces<APIResponse>(201)
+            .Produces<ApiResponse<UserLoginDTO>>(201)
             .Produces(400)
             .Accepts<UserLoginDTO>(contentType: "application/json");
 
 
             app.MapPost("/api/register", Register).WithName("register")
-            .Produces<APIResponse>(201)
+            .Produces<ApiResponse<UserRegisterDTO>>(201)
             .Produces(400)
             .Accepts<UserRegisterDTO>(contentType: "application/json");
 
@@ -37,10 +38,13 @@ namespace Coupon_API.EndPoints
 
             app.MapPost("/api/auth/refresh", RefreshToken)
             .WithName("RefreshToken")
+            .Produces<ApiResponse<AuthResponseDto>>()
+            .Produces(400)
             .WithOpenApi()
             .AllowAnonymous();
 
         }
+
         private static async Task<IResult> Login(IAuthRepository authRepository, [FromBody] UserLoginDTO userLogin)
         {
             APIResponse response = new APIResponse();
@@ -61,6 +65,7 @@ namespace Coupon_API.EndPoints
 
             return Results.Ok(response);
         }
+
         private static async Task<IResult> Register(IAuthRepository authRepository, [FromBody] UserRegisterDTO userRegister)
         {
             APIResponse response = new APIResponse();
@@ -81,7 +86,6 @@ namespace Coupon_API.EndPoints
 
             return Results.Ok(response);
         }
-
 
         private static async Task<IResult> SecureLogin(IAuthRepository authRepository, [FromBody] UserLoginDTO userLogin)
         {
@@ -117,8 +121,5 @@ namespace Coupon_API.EndPoints
                 ? Results.Ok(result)
                 : Results.BadRequest(result);
         }
-
-
-
     }
 }
