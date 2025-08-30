@@ -116,6 +116,8 @@ namespace Coupon_API.Repository
                 _db.RefreshTokens.Add(refreshTokenEntity);
                 await _db.SaveChangesAsync();
 
+                user.Password = string.Empty;
+
                 var authResponse = new AuthResponseDto
                 {
                     Token = jwtToken,
