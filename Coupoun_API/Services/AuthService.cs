@@ -111,8 +111,8 @@ namespace Coupon_API.Services
                     User = user
                 };
 
-                _logger.LogInformation("Token refreshed Sucess  for user {UserId}", userId);
-                return ApiResponse<AuthResponseDto>.Ok(authResponse, "Token refreshed Okfully");
+                _logger.LogInformation("Token refreshed Sucessfully  for user {UserId}", userId);
+                return ApiResponse<AuthResponseDto>.Ok(authResponse, "Token refreshed Sucessfully");
             }
             catch (Exception ex)
             {
