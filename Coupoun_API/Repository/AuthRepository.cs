@@ -121,17 +121,7 @@ namespace Coupon_API.Repository
                     Token = jwtToken,
                     RefreshToken = refreshToken,
                     ExpiresAt = DateTime.UtcNow.AddHours(24),
-                    User = new UserLoginResponseDTO
-                    {
-                        User = new UserDTO
-                        {
-                            Id = user.Id,
-                            Name = user.Name,
-                            UserName = user.UserName,
-                            Password = user.Password,
-                        },
-                        Token = jwtToken
-                    }
+                    User =  user
                 };
 
                 return ApiResponse<AuthResponseDto>.Ok(authResponse, "Login successful");
