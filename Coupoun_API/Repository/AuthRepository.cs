@@ -162,5 +162,12 @@ namespace Coupon_API.Repository
             }
         }
 
+
+        public ApiResponse<bool> ValidateToken(string token)
+        {
+            var isValidToken = _jwtService.ValidateToken(token);
+            return ApiResponse<bool>.Ok(isValidToken);
+        }
+
     }
 }
