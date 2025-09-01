@@ -14,5 +14,7 @@ namespace Coupon_API.Repository.IRepository
         Task<ApiResponse<AuthResponseDto>> LoginAsync(UserLoginDTO loginDto);
 
         Task<ApiResponse<string>> LogoutAsync(string refreshToken);
+
+        ApiResponse<bool> ValidateToken(string token);
     }
 }
