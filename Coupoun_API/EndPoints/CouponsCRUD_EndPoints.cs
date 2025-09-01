@@ -56,7 +56,8 @@ namespace Coupon_API.EndPoints
             app.MapDelete("/api/coupon{id:int}", DeleteCoupon)
             .WithName("DeleteCoupon")
             .Produces<ApiResponse<CouponDTO>>(200)
-            .Produces(400);
+            .Produces(400)
+            .RequireAuthorization("adminOnly");
 
 
             app.MapGet("/api/coupon/search", SearchCoupon)
