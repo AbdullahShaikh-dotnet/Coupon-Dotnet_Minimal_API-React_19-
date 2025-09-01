@@ -24,7 +24,7 @@ const CouponFields = () => {
     const { couponID, operation } = useParams()
     const [FieldError, setFieldError] = useState({})
     const navigate = useNavigate()
-    const { user } = useContext(UserContext)
+    const { user, token } = useContext(UserContext)
 
     // Determine if we're in edit mode
     const isEditMode = operation === "edit" && couponID
@@ -92,7 +92,7 @@ const CouponFields = () => {
 
         try {
             if (isEditMode) {
-                await updateCoupon(defaultValues, user.token)
+                await updateCoupon(defaultValues, token)
                 toast.success("Coupon updated successfully!")
             } else {
 
@@ -103,7 +103,7 @@ const CouponFields = () => {
                     isActive: defaultValues.isActive
                 }
 
-                await createCoupon(postObject, user.token);
+                await createCoupon(postObject, token);
                 toast.success("Coupon created successfully!")
             }
             navigate("/main/home")
