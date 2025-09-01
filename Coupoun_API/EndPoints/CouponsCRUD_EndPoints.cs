@@ -109,7 +109,7 @@ namespace Coupon_API.EndPoints
                 return Results.BadRequest(badRequest);
             }
 
-            if (await _db.Coupons.AnyAsync(c => c.Name.ToLower() == _CouponCreateDTO.Name.ToLower()))
+            if (await _db.Coupons.AnyAsync(c => c.Name.ToLower() == _CouponCreateDTO.Name.ToLower() && c.DeleteId == null))
             {
                 var alreadyExists = ApiResponse<CouponCreateDTO>
                     .Fail(errors: new List<string>()
