@@ -73,9 +73,9 @@ const Login = () => {
                     (await loginRequest("/api/Login")) ||
                     (await loginRequest("/API/login"));
 
-                if (!data || data.isSuccess === false) {
+                if (!data || data.success === false) {
                     const errorMessage =
-                        data?.errorMessages?.join(", ") ||
+                        data?.errors?.join(", ") ||
                         "Login failed. Please check your credentials.";
                     toast.error(errorMessage);
 
@@ -87,12 +87,14 @@ const Login = () => {
                     return;
                 }
 
-                setUser(data.result);
-                localStorage.setItem("user", JSON.stringify(data.result));
+                setUser(data.data);
+                localStorage.setItem("user", JSON.stringify(data.data.user));
+                localStorage.setItem("details", JSON.stringify(data.data));
 
                 if (rememberMe) {
                     localStorage.setItem("username", username);
-                    localStorage.setItem("token", data.result.token);
+                    localStorage.setItem("token", data.data.token);
+                    localStorage.setItem("refreshToken", data.data.refreshToken);
                 }
                 localStorage.setItem("isLoggedIn", "true");
 
