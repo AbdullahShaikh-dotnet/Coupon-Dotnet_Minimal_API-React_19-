@@ -12,16 +12,19 @@ namespace Coupon_API.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IJwtService _jwtService;
+        private readonly IConfiguration _configuration;
         private readonly ILogger<AuthService> _logger;
 
         public AuthService(
             ApplicationDbContext context,
             IJwtService jwtService,
-            ILogger<AuthService> logger)
+            ILogger<AuthService> logger,
+            IConfiguration configuration)
         {
             _context = context;
             _jwtService = jwtService;
             _logger = logger;
+            _configuration = configuration;
         }
 
         public async Task<ApiResponse<AuthResponseDto>> RefreshTokenAsync(RefreshTokenDto refreshTokenDto)
@@ -107,7 +110,7 @@ namespace Coupon_API.Services
                 {
                     Token = newJwtToken,
                     RefreshToken = newRefreshToken,
-                    ExpiresAt = DateTime.UtcNow.AddHours(24), // JWT expires in 24 hours
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["JwtSettings:ExpirationInMinutes"])), // JWT expires in 24 hours
                     User = user
                 };
 
