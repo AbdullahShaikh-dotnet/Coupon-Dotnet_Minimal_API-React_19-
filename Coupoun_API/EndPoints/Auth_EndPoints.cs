@@ -43,6 +43,13 @@ namespace Coupon_API.EndPoints
             .WithOpenApi()
             .AllowAnonymous();
 
+
+            app.MapPost("/api/validatetoken", ValidateToken)
+            .WithName("Validate_Token")
+            .Produces<ApiResponse<bool>>()
+            .Produces(400)
+            .WithOpenApi()
+            .AllowAnonymous();
         }
 
         private static async Task<IResult> Login(IAuthRepository authRepository, [FromBody] UserLoginDTO userLogin)
@@ -51,7 +58,7 @@ namespace Coupon_API.EndPoints
 
             var LoginResponse = await authRepository.Login(userLogin);
 
-            if(LoginResponse is null)
+            if (LoginResponse is null)
             {
                 response.ErrorMessages.Add("Username or Password is incorrect");
                 response.IsSuccess = false;
@@ -120,6 +127,12 @@ namespace Coupon_API.EndPoints
             return result.Success
                 ? Results.Ok(result)
                 : Results.BadRequest(result);
+        }
+
+        private static async Task<IResult> ValidateToken(IAuthRepository authRepository, string token)
+        {
+            var response = authRepository.ValidateToken(token);
+            return response.Success ? Results.Ok(response) : Results.BadRequest(response);
         }
     }
 }
