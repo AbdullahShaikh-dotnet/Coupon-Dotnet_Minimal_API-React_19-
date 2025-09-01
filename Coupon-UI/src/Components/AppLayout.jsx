@@ -17,10 +17,26 @@ const AppLayout = () => {
         return storedUserObject ? JSON.parse(storedUserObject) : null;
     });
 
+
+    const [token, setToken] = useState(() => {
+        const tokenObject = localStorage.getItem("token");
+        return tokenObject ?? null;
+    });
+
+    const [refreshToken, setRefreshToken] = useState(() => {
+        const refreshTokenObject = localStorage.getItem("refreshToken");
+        return refreshTokenObject ?? null;
+    });
+
+    const [details, setdetails] = useState(() => {
+        const detailsObject = localStorage.getItem("details");
+        return detailsObject ?? null;
+    });
+
+
     useEffect(() => {
-        if (!user) {
+        if (!user)
             navigate("/login", { replace: true });
-        }
 
         const timer = setInterval(() => {
             setProgress((prev) => (prev >= 100 ? 10 : prev + 10));
@@ -40,7 +56,7 @@ const AppLayout = () => {
     }
 
     return (
-        <UserContext.Provider value={{ user, setUser, isLoggedIn: !!user }}>
+        <UserContext.Provider value={{ user, setUser, isLoggedIn: !!user, token: token, refreshToken: refreshToken, setRefreshToken, setToken, details, setdetails }}>
             <Header className="fixed top-0 left-0 w-full h-16 bg-gray-800 text-white flex items-center px-4" />
             <OfflineFallback>
                 <Outlet />
