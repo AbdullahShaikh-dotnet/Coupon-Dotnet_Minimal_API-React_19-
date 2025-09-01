@@ -184,9 +184,7 @@ namespace Coupon_API.EndPoints
 
             await _db.SaveChangesAsync();
 
-            var coupons = _db.Coupons.Where(prop => prop.DeleteId == null);
-            var response = ApiResponse<CouponDTO>.Ok(data: mapper.Map<CouponDTO>(coupons));
-
+            var response = ApiResponse<CouponDTO>.Ok(data: mapper.Map<CouponDTO>(coupon));
             return Results.CreatedAtRoute("GetCoupon", new { id }, response);
         }
 
