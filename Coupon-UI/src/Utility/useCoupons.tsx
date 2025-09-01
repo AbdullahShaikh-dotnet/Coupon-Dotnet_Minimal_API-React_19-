@@ -25,12 +25,12 @@ export function useCouponsGet() {
             const res =
                 (await fetch("/api/coupon")) || (await fetch("/API/coupon"));
             const GetCouponData = await res.json();
-
-            if (!GetCouponData.isSuccess) {
-                throw new Error(GetCouponData.errorMessages.join(", "));
+            console.log(GetCouponData)
+            if (!GetCouponData.success) {
+                throw new Error(GetCouponData.errors.join(", "));
             }
 
-            setData(GetCouponData.result);
+            setData(GetCouponData.data);
             setLoading(false);
         } catch (err: any) {
             setError(err || new Error("Something went wrong !!"));
@@ -57,11 +57,11 @@ export function useCouponsGetByID(id: number) {
                 (await fetch(`/api/coupon/${id}`)) || (await fetch(`/API/coupon/${id}`));
             const GetCouponData = await res.json();
 
-            if (!GetCouponData.isSuccess) {
-                throw new Error(GetCouponData.errorMessages.join(", "));
+            if (!GetCouponData.success) {
+                throw new Error(GetCouponData.errors.join(", "));
             }
 
-            setData(GetCouponData.result[0]);
+            setData(GetCouponData.data[0]);
             setLoading(false);
         } catch (err: any) {
             setError(err || new Error("Something went wrong !!"));
@@ -91,8 +91,8 @@ export function useCouponPut() {
 
             const response = await res.json();
 
-            if (!response.isSuccess) {
-                throw new Error(response.errorMessages.join(", "));
+            if (!response.success) {
+                throw new Error(response.errors.join(", "));
             }
 
             return response;
@@ -126,8 +126,10 @@ export function useCouponDelete() {
 
             const response = await res.json();
 
-            if (!response.isSuccess) {
-                throw new Error(response.errorMessages.join(", "));
+            console.log(response);
+
+            if (!response.success) {
+                throw new Error(response.errors.join(", "));
             }
 
             setData(response);
@@ -160,8 +162,8 @@ export function useCouponPost() {
 
             const response = await res.json();
 
-            if (!response.isSuccess) {
-                throw new Error(response.errorMessages.join(", "));
+            if (!response.success) {
+                throw new Error(response.errors.join(", "));
             }
 
             return response;
