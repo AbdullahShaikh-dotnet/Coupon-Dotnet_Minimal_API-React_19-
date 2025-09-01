@@ -14,7 +14,7 @@ namespace Coupon_API.Services
         private readonly string _secretKey;
         private readonly string _issuer;
         private readonly string _audience;
-        private readonly int _expirationHours;
+        private readonly int _expirationMinutes;
 
         public JwtService(IConfiguration configuration)
         {
@@ -22,7 +22,7 @@ namespace Coupon_API.Services
             _secretKey = _configuration.GetValue<string>("Auth:secret") ?? throw new ArgumentException("JWT Secret not configured");
             _issuer = _configuration["JwtSettings:Issuer"] ?? "CouponAPI";
             _audience = _configuration["JwtSettings:Audience"] ?? "CouponApp";
-            _expirationHours = int.Parse(_configuration["JwtSettings:ExpirationInHours"] ?? "1");
+            _expirationMinutes = int.Parse(_configuration["JwtSettings:ExpirationInMinutes"] ?? "1");
         }
 
         public string GenerateJwtToken(User user)
@@ -45,7 +45,7 @@ namespace Coupon_API.Services
                 issuer: _issuer,
                 audience: _audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(_expirationHours),
+                expires: DateTime.UtcNow.AddMinutes(_expirationMinutes),
                 signingCredentials: credentials
             );
 
