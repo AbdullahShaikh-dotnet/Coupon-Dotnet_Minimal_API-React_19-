@@ -45,7 +45,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const ITEMS_PER_PAGE = 8
 
 const Home = () => {
-    const { user } = useContext(UserContext)
+    const { token } = useContext(UserContext)
     const { data, error, isLoading, refetch } = useCouponsGet()
     const progress = useLoader(isLoading)
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -110,7 +110,7 @@ const Home = () => {
     }
 
     const handleDelete = async () => {
-        const promise = DeleteCoupon(Number(selectedCouponId), user.token.toString())
+        const promise = DeleteCoupon(Number(selectedCouponId), token.toString())
 
         toast.promise(promise, {
             loading: "Deleting coupon...",
