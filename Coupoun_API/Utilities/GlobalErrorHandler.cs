@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace Coupon_API.Utilities
 {
@@ -26,7 +27,8 @@ namespace Coupon_API.Utilities
                         // Hide technical details from client (professional API practice)
                         var clientError = new List<string>()
                         {
-                            "An unexpected error occurred. Please contact support."
+                            "An unexpected error occurred. Please contact support.",
+                            ex.Message,
                         };
 
                         var errorResponse = ApiResponse<List<string>>.Fail(errors: clientError, message: "Internal Server Error", statusCode: 500);
