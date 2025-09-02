@@ -21,7 +21,7 @@ namespace Coupon_API.Utilities
                         partitionKey: clientKey,
                         factory: _ => new SlidingWindowRateLimiterOptions
                         {
-                            PermitLimit = 30,
+                            PermitLimit = 60,
                             Window = TimeSpan.FromSeconds(60),
                             SegmentsPerWindow = 6,
                             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
@@ -38,7 +38,7 @@ namespace Coupon_API.Utilities
                         partitionKey: clientKey,
                         factory: _ => new ConcurrencyLimiterOptions
                         {
-                            PermitLimit = 5,
+                            PermitLimit = 30,
                             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                             QueueLimit = 0
                         });
