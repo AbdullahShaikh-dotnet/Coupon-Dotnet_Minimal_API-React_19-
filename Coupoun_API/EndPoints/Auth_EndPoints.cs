@@ -39,6 +39,7 @@ namespace Coupon_API.EndPoints
             app.MapPost("/api/auth/refresh", RefreshToken)
             .WithName("RefreshToken")
             .Produces<ApiResponse<AuthResponseDto>>()
+            .Accepts<AuthResponseDto>(contentType:"application/json")
             .Produces(400)
             .WithOpenApi()
             .AllowAnonymous();
@@ -107,7 +108,7 @@ namespace Coupon_API.EndPoints
             return response.Success ? Results.Ok(response) : Results.BadRequest(response);
         }
 
-        private static async Task<IResult> RefreshToken(RefreshTokenDto refreshTokenDto, IAuthService authService, IValidator<RefreshTokenDto> validator)
+        private static async Task<IResult> RefreshToken(IAuthService authService, IValidator<RefreshTokenDto> validator, [FromBody] RefreshTokenDto refreshTokenDto)
         {
             var validationResult = await validator.ValidateAsync(refreshTokenDto);
             if (!validationResult.IsValid)
