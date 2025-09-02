@@ -1,22 +1,13 @@
 import { useApiRequest, HttpMethod } from '../Utility/useApi';
 
 export function useAuth() {
-    // Validate Token
+    // Validate Token (disabled by default, call refetch manually)
     const validateToken = useApiRequest<boolean>(
         `/api/validatetoken`,
         HttpMethod.POST,
         null,
-        { enabled: false } // You can control when to trigger it
+        { enabled: false }
     );
-
-    // Refresh Token
-    const refreshToken = (token: string, refreshToken: string) =>
-        useApiRequest<{ token: string; refreshToken: string }>(
-            `/api/auth/refresh`,
-            HttpMethod.POST,
-            { token, refreshToken },
-            { enabled: false }
-        );
 
     // Login
     type ResponseType = {
@@ -30,13 +21,23 @@ export function useAuth() {
         };
     };
 
-    const login = (username: string, password: string) =>
-        useApiRequest<ResponseType>(
-            `/api/login`,
-            HttpMethod.POST,
-            { username, password },
-            { enabled: false }
-        );
+    const login = useApiRequest<ResponseType>(
+        `/api/login`,
+        HttpMethod.POST,
+        null,
+        { enabled: false }
+    );
 
-    return { validateToken, refreshToken, login };
+    // Refresh Token (disabled by default too)
+    const refresh = useApiRequest<{ token: string; refreshToken: string }>(
+        `/api/auth/refresh`,
+        HttpMethod.POST,
+        {
+            token: localStorage.getItem("token"),
+            refreshToken: localStorage.getItem("refreshToken")
+        },
+        { enabled: true }
+    );
+
+    return { validateToken, login, refresh };
 }

@@ -23,7 +23,7 @@ export function useApiRequest<T>(
         enabled?: boolean; // toggle request
     }
 ) {
-    const { token } = useContext(UserContext);
+    const { token, refreshToken } = useContext(UserContext);
     const [data, setData] = useState<T | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -35,52 +35,58 @@ export function useApiRequest<T>(
         enabled = true
     } = options || {};
 
-    const fetchData = useCallback(async () => {
-        if (!enabled) return;
+    const fetchData = useCallback(
+        async (overrideBody?: unknown) => {
+            if (!enabled) return;
 
-        setLoading(true);
-        setError(null);
+            setLoading(true);
+            setError(null);
 
-        let attempts = 0;
+            let attempts = 0;
 
-        while (attempts < retryPolicy) {
-            try {
+            while (attempts < retryPolicy) {
+                try {
+                    const headers: Record<string, string> = {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                    };
 
-                const headers: Record<string, string> = {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                };
+                    if (token) {
+                        headers["Authorization"] = `Bearer ${token}`;
+                    }
 
-                if (token) {
-                    headers['Authorization'] = `Bearer ${token}`;
-                }
+                    const res = await fetch(url, {
+                        method,
+                        headers,
+                        body:
+                            method !== HttpMethod.GET && (overrideBody ?? value) !== null
+                                ? JSON.stringify(overrideBody ?? value)
+                                : undefined,
+                    });
 
-                const res = await fetch(url, {
-                    method,
-                    headers,
-                    body: method !== HttpMethod.GET && value !== null ? JSON.stringify(value) : undefined
-                });
+                    const response = await res.json();
 
-                const response = await res.json();
+                    if (!response.success) {
+                        throw new Error(response.errors?.join(", ") || "Unknown error");
+                    }
 
-                if (!response.success) {
-                    throw new Error(response.errors?.join(", ") || "Unknown error");
-                }
-
-                setData(response.data as T);
-                setLoading(false);
-                return;
-            } catch (err: any) {
-                attempts++;
-                if (attempts >= retryPolicy) {
-                    setError(`API call failed after ${retryPolicy} attempts: ${err.message}`);
+                    setData(response.data as T);
                     setLoading(false);
                     return;
+                } catch (err: any) {
+                    attempts++;
+                    if (attempts >= retryPolicy) {
+                        setError(`API call failed after ${retryPolicy} attempts: ${err.message}`);
+                        setLoading(false);
+                        return;
+                    }
+                    await sleep(1000 * attempts);
                 }
-                await sleep(1000 * attempts);
             }
-        }
-    }, [url, method, value, token, retryPolicy, enabled]);
+        },
+        [url, method, value, token, retryPolicy, enabled]
+    );
+
 
     useEffect(() => {
         fetchData();
